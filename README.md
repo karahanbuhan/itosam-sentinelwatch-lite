@@ -2,4 +2,8 @@
 
 ## Çalıştırma
 Bu projede venv kullanılmaktadır, kütüphaneler yüklendikten sonra aşağıdaki komutla backend sunucu çalıştırılmaya başlanabilir:
-`fastapi dev ./src/main.py` 
+```Bash
+python -m venv .
+source ./Scripts/activate
+fastapi dev ./src/main.py
+``` 
