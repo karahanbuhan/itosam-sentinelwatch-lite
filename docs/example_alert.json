@@ -1,0 +1,8 @@
+[
+    {
+        "type": "BRUTE_FORCE",
+        "severity": "high",
+        "sourceIp": "185.23.11.4",
+        "description": "185.23.11.4 adresinden 5 dakikada 6 basarisiz giris denemesi"
+    }
+]
