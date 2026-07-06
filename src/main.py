@@ -27,15 +27,14 @@ origins = [
     "http://localhost:8000",
 ]
 
-@app.on_event("startup")
-@repeat_every(seconds=15)
-def return_load_factor():
-    times
-    cur.execute("INSERT INTO events (timestamp, ) VALUES (GETDATE())")
+#@app.on_event("startup")
+#@repeat_every(seconds=15)
+#def return_load_factor():
+#    cur.execute("INSERT INTO events (timestamp, ) VALUES (GETDATE())")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
