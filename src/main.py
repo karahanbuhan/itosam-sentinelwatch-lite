@@ -8,7 +8,7 @@ import sqlite3
 con = sqlite3.connect("database.db")
 cur = con.cursor()
 
-def create_table():
+def create_database_and_table():
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS events (
                     id INTEGER PRIMARY KEY,
@@ -19,6 +19,7 @@ def create_table():
                 )
         """)
 
+create_database_and_table()
 app = FastAPI()
 
 origins = [
