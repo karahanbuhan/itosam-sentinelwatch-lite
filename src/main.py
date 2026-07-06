@@ -1,8 +1,38 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import json
+import sqlite3
+
+import sqlite3
+
+con = sqlite3.connect("database.db")
+cur = con.cursor()
+
+def create_table():
+    cur.execute("""
+                CREATE TABLE IF NOT EXISTS events (
+                    id INTEGER PRIMARY KEY,
+                    timestamp DATETIME NOT NULL,
+                    source_ip TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    username TEXT
+                )
+        """)
 
 app = FastAPI()
 
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/events")
 def api_events():
