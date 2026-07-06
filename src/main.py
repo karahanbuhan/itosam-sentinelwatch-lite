@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_utils.tasks import repeat_every
 import json
 import sqlite3
 
@@ -27,10 +28,10 @@ origins = [
     "http://localhost:8000",
 ]
 
-#@app.on_event("startup")
-#@repeat_every(seconds=15)
-#def return_load_factor():
-#    cur.execute("INSERT INTO events (timestamp, ) VALUES (GETDATE())")
+@app.on_event("startup")
+@repeat_every(seconds=2)
+def insert_mock_event():
+    cur.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES (GETDATE(), '192.168.1.1', 'LOGIN_FAILED', 'karahan')");
 
 app.add_middleware(
     CORSMiddleware,
