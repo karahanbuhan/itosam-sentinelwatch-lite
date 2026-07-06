@@ -13,7 +13,7 @@ def create_database_and_table():
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS events (
                     id INTEGER PRIMARY KEY,
-                    timestamp DATETIME NOT NULL,
+                    timestamp TEXT NOT NULL,
                     source_ip TEXT NOT NULL,
                     event_type TEXT NOT NULL,
                     username TEXT
@@ -31,8 +31,10 @@ origins = [
 @app.on_event("startup")
 @repeat_every(seconds=2)
 def insert_mock_event():
-    cur.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES (GETDATE(), '192.168.1.1', 'LOGIN_FAILED', 'karahan')");
-
+    print("hello");
+    cur.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES ('2026-07-06T14:32:10Z', '192.168.1.1', 'LOGIN_FAILED', 'karahan');");
+    cur.getdb().commit()
+    
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
