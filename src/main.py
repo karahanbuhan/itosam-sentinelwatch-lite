@@ -1,26 +1,17 @@
+import json
+import sys
+import sqlite3
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
-import json
-import sqlite3
 
-import sqlite3
+from sqlalchemy.orm import Session
+from database import Event, db_engine
 
 con = sqlite3.connect("database.db")
 cur = con.cursor()
 
-def create_database_and_table():
-    cur.execute("""
-                CREATE TABLE IF NOT EXISTS events (
-                    id INTEGER PRIMARY KEY,
-                    timestamp TEXT NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    event_type TEXT NOT NULL,
-                    username TEXT
-                )
-        """)
-
-create_database_and_table()
 app = FastAPI()
 
 origins = [
@@ -30,10 +21,14 @@ origins = [
 
 @app.on_event("startup")
 @repeat_every(seconds=2)
-def insert_mock_event():
-    print("hello");
-    cur.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES ('2026-07-06T14:32:10Z', '192.168.1.1', 'LOGIN_FAILED', 'karahan');");
-    cur.getdb().commit()
+async def insert_mock_event():
+    print("hello")
+    with Session(db_engine) as session:
+        event = Event(timestamp="pazartesi", source_ip="192.168.1.1", event_type="LOGIN_FAILED", username="karahan")
+        session.add(event)
+        session.commit()
+    
+    print("test")
     
 app.add_middleware(
     CORSMiddleware,
