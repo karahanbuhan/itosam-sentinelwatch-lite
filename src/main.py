@@ -7,10 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 
 from sqlalchemy.orm import Session
-from database import Event, db_engine
+from databases import Database
 
-con = sqlite3.connect("database.db")
-cur = con.cursor()
+# Database setup
+database = Database("sqlite:///database.db")
 
 app = FastAPI()
 
@@ -20,14 +20,27 @@ origins = [
 ]
 
 @app.on_event("startup")
+async def database_connect():
+    await database.connect()
+    
+    # Create events table if it does not exist
+    query = """CREATE TABLE IF NOT EXISTS events (
+                    id INTEGER PRIMARY KEY,
+                    timestamp TEXT NOT NULL,
+                    source_ip TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    username TEXT
+                )"""
+    await database.execute(query);
+    
+@app.on_event("shutdown")
+async def database_disconnect():
+    await database.disconnect()
+
+@app.on_event("startup")
 @repeat_every(seconds=2)
 async def insert_mock_event():
-    print("hello")
-    with Session(db_engine) as session:
-        event = Event(timestamp="pazartesi", source_ip="192.168.1.1", event_type="LOGIN_FAILED", username="karahan")
-        session.add(event)
-        session.commit()
-    
+    await database.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES('salı', '192.168.1.1', 'LOGIN_FAILED', 'Karahan')")
     print("test")
     
 app.add_middleware(
