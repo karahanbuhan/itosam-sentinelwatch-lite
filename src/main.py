@@ -1,13 +1,16 @@
 import json
+import datetime
+import string
+import ipaddress
+import random
 import sys
-import sqlite3
+
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
-
-from sqlalchemy.orm import Session
 from databases import Database
+
 
 # Database setup
 database = Database("sqlite:///database.db")
@@ -37,11 +40,33 @@ async def database_connect():
 async def database_disconnect():
     await database.disconnect()
 
+def generate_username():
+    characters = string.ascii_letters + string.digits + '._-'
+    username = ''.join(random.choice(characters) for _ in range(random.randint(5, 32)))
+    return username
+
 @app.on_event("startup")
 @repeat_every(seconds=2)
 async def insert_mock_event():
-    await database.execute("INSERT INTO events (timestamp, source_ip, event_type, username) VALUES('salı', '192.168.1.1', 'LOGIN_FAILED', 'Karahan')")
-    print("test")
+    timestamp = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
+    source_ip = '{}.{}.{}.{}'.format(*__import__('random').sample(range(0,255),4)) # TODO: Generate IPv4s from specified classes
+    event_type = random.choice(["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "REQUEST"])
+
+    username = None
+    if event_type.startswith("LOGIN"):
+        username = random.choice(["admin", "karahan", "ahmet", generate_username()])
+        
+    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username)"
+    values = [
+        { 
+         "timestamp": timestamp,
+         "source_ip": source_ip,
+         "event_type": event_type,
+         "username": username
+        }
+    ]
+    
+    await database.execute_many(query=query, values=values)
     
 app.add_middleware(
     CORSMiddleware,
