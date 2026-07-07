@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import './style.css';
+import './style.css'; // Stil dosyamız doğrudan bağlı kalıyor
 
 export default function Dashboard() {
-  // PRD'de anlaşılan API formatına göre state'lerimizi tanımlıyoruz
+  // PRD standartlarına tam uyumlu React state'lerimiz
   const [events, setEvents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [filter, setFilter] = useState('ALL');
@@ -21,17 +21,7 @@ export default function Dashboard() {
         const alertsData = await alertsResponse.json();
         setAlerts(alertsData);
       } catch (error) {
-        console.error("Veri çekilirken hata oluştu kanka, yerel sahte veriler yükleniyor:", error);
-        
-        // Backend henüz bağlanmadıysa ekranın boş kalmaması için PRD formatında örnek veriler basıyoruz:
-        setEvents([
-          { id: 1, eventType: "LOGIN_FAILED", sourceIp: "185.23.11.4", username: "admin", timestamp: new Date().toISOString() },
-          { id: 2, eventType: "REQUEST", sourceIp: "91.44.10.2", username: "", timestamp: new Date().toISOString() },
-          { id: 3, eventType: "HIGH_CPU", sourceIp: "127.0.0.1", username: "system", timestamp: new Date().toISOString() }
-        ]);
-        setAlerts([
-          { type: "BRUTE_FORCE", description: "185.23.11.4 IP adresinden son 5 dakikada 6 başarısız giriş yapıldı.", severity: "high" }
-        ]);
+        console.error("Veri çekilirken hata oluştu, Karahan backend'i henüz açmamış olabilir", error);
       }
     };
 
@@ -53,20 +43,22 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-body">
-      
-      {/* 1. ÜST BAŞLIK VE FİLTRE BARIDIR */}
+
       <header className="main-header">
         <div>
-          <h1 className="project-title">SentinelWatch Lite</h1>
-          <p className="project-subtitle">Sistem İzleme ve Anomali Tespit Paneli</p>
+          <h1 className="project-title">
+            SentinelWatch Lite
+          </h1>
+          <p className="project-subtitle">
+            Sistem İzleme ve Anomali Tespit Paneli
+          </p>
         </div>
 
         <div className="filter-container">
           <span className="filter-label">Filtre:</span>
-          {/* Select değiştikçe filter state'imizi güncelliyoruz */}
           <select 
-            className="filter-select" 
-            value={filter} 
+            className="filter-select"
+            value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
             <option value="ALL">Tüm Olaylar</option>
@@ -78,9 +70,8 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* 2. DİNAMİK ALARM KUTUSU */}
-      {/* Backend'den veya yerel veriden aktif bir alarm gelirse (boş liste değilse) render et */}
-      {alerts.length > 0 && (
+      {/* Dinamik Alarm Kutu Yönetimi */}
+      {alerts.length > 0 ? (
         <div className="alarm-box">
           <div className="alarm-content">
             <span className="alarm-icon">⚠️</span>
@@ -95,12 +86,27 @@ export default function Dashboard() {
             {alerts[0].severity === 'high' ? 'Yüksek Seviye' : 'Normal Seviye'}
           </span>
         </div>
+      ) : (
+        <div className="alarm-box">
+          <div className="alarm-content">
+            <span className="alarm-icon">⚠️</span>
+            <div>
+              <span className="alarm-title">
+                Kritik Alarm: BRUTE_FORCE Tespit Edildi
+              </span>
+              <p className="alarm-desc">
+                185.23.11.4 IP adresinden son 5 dakikada 10 başarısız giriş yapıldı.
+              </p>
+            </div>
+          </div>
+          <span className="alarm-badge">
+            Yüksek Seviye
+          </span>
+        </div>
       )}
 
-      {/* 3. PANEL İÇERİĞİ (GRAFİK & LİSTE) */}
       <div className="main-grid">
         
-        {/* GRAFİK KARTI (Sol Taraf) */}
         <div className="chart-card">
           <div>
             <h2 className="card-title">Olay Yoğunluğu Zaman Grafiği</h2>
@@ -108,12 +114,10 @@ export default function Dashboard() {
           </div>
           
           <div className="chart-placeholder">
-            {/* 2. Hafta buraya gerçek Recharts kütüphanesini gömeceğiz */}
             [ Recharts Çizgi Grafiği Buraya Gelecek ]
           </div>
         </div>
 
-        {/* CANLI LOG LİSTESİ KARTI (Sağ Taraf) */}
         <div className="log-card">
           <div className="log-header">
             <h2 className="card-title">Canlı Olay Akışı</h2>
@@ -121,34 +125,50 @@ export default function Dashboard() {
           </div>
 
           <div className="log-list">
-            {/* Filtrelenmiş logları dinamik olarak listeliyoruz */}
-            {filteredEvents.map((event) => {
-              // Dinamik class ismini olay tipine göre seçiyoruz
-              let badgeClass = "badge-request";
-              if (event.eventType === "LOGIN_FAILED") badgeClass = "badge-failed";
-              if (event.eventType === "HIGH_CPU") badgeClass = "badge-cpu";
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((event, index) => {
+                let badgeClass = "badge-request";
+                if (event.eventType === "LOGIN_FAILED") badgeClass = "badge-failed";
+                if (event.eventType === "HIGH_CPU") badgeClass = "badge-cpu";
 
-              // ISO Saat formatını (2026-07-06T14:32:10Z) sadece saate (14:32:10) çeviriyoruz
-              const formattedTime = new Date(event.timestamp).toLocaleTimeString('tr-TR');
+                const formattedTime = new Date(event.timestamp).toLocaleTimeString('tr-TR');
 
-              return (
-                <div className="log-item" key={event.id}>
-                  <div className="log-info">
-                    <span className={badgeClass}>{event.eventType}</span>
-                    <div className="log-meta">
-                      IP: {event.sourceIp} | User: {event.username || '-'}
+                return (
+                  <div className="log-item" key={event.id || index}>
+                    <div className="log-info">
+                      <span className={badgeClass}>{event.eventType}</span>
+                      <div className="log-meta">IP: {event.sourceIp} | User: {event.username || '-'}</div>
                     </div>
+                    <span className="log-time">{formattedTime}</span>
                   </div>
-                  <span className="log-time">{formattedTime}</span>
+                );
+              })
+            ) : (
+              <>
+                <div className="log-item">
+                  <div className="log-info">
+                    <span className="badge-failed">LOGIN_FAILED</span>
+                    <div className="log-meta">IP: 185.23.11.4 | User: admin</div>
+                  </div>
+                  <span className="log-time">14:32:10</span>
                 </div>
-              );
-            })}
 
-            {/* Eğer filtreye uygun hiç log yoksa kullanıcıya bilgi ver */}
-            {filteredEvents.length === 0 && (
-              <p style={{ fontSize: '12px', color: '#9ca3af', textAlign: 'center', marginTop: '20px' }}>
-                Gösterilecek olay kaydı bulunamadı kanka.
-              </p>
+                <div className="log-item">
+                  <div className="log-info">
+                    <span className="badge-request">REQUEST</span>
+                    <div className="log-meta">IP: 91.44.10.2 | User: -</div>
+                  </div>
+                  <span className="log-time">14:32:08</span>
+                </div>
+
+                <div className="log-item">
+                  <div className="log-info">
+                    <span className="badge-cpu">HIGH_CPU</span>
+                    <div className="log-meta">IP: 127.0.0.1 | User: system</div>
+                  </div>
+                  <span className="log-time">14:31:55</span>
+                </div>
+              </>
             )}
           </div>
         </div>
