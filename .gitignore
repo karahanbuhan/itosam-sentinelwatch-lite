@@ -207,7 +207,7 @@ pip-selfcheck.json
 # End of https://www.toptal.com/developers/gitignore/api/venv,python,visualstudiocode
 
 # Testing
-./test.py
+test.py
 
 # Database
-./database.db
+database.db
