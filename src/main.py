@@ -1,9 +1,10 @@
 import json
-import datetime
+from datetime import datetime, timezone
 import string
 import ipaddress
 import random
 import sys
+import csv
 
 
 from fastapi import FastAPI
@@ -11,12 +12,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 from databases import Database
 
+# Store usernames for generating mock data
+usernames = []
+with open("./resources/datasets/github_users.csv", newline="", encoding="utf-8") as csvfile:
+    github_users_reader = csv.reader(csvfile, delimiter=" ")
+    for row in github_users_reader:
+        username = " ".join(row).split(",")[0]
+        
+        if len(username) > 32 or not username.isalnum():
+            continue
+        
+        usernames.append(username)
 
 # Database setup
 database = Database("sqlite:///database.db")
 
+# Fast API setup
 app = FastAPI()
-
+# Origins used for CORS
 origins = [
     "http://localhost",
     "http://localhost:8000",
@@ -40,31 +53,40 @@ async def database_connect():
 
 @app.on_event("shutdown")
 async def database_disconnect():
-    await database.disconnect()
+    await database.disconnect()    
 
-
-def generate_username():
-    characters = string.ascii_letters + string.digits + '._-'
-    username = ''.join(random.choice(characters)
-                       for _ in range(random.randint(5, 32)))
-    return username
+# Map user - ip relation so in mock system, it looks like same user connects with same ip address. Add to the dict in background
+user_ip_dict = { "admin": "183.43.14.251" }
+def generate_username_and_ip():
+    octet1 = random.randint(0, 223) # IPv4 classes A, B and C are used
+    octet2 = random.randint(0, 255)
+    octet3 = random.randint(0, 255)
+    octet4 = random.randint(0, 255)
+    ip = f"{octet1}.{octet2}.{octet3}.{octet4}"
+    
+    user_ip_dict[random.choice(usernames)] = ip
+# Generate 10 users for initial startup
+for i in range(0, 10):
+    generate_username_and_ip()
 
 
 @app.on_event("startup")
 @repeat_every(seconds=2)
 async def insert_mock_event():
-    timestamp = datetime.datetime.now(
-        datetime.timezone.utc).replace(microsecond=0).isoformat()
-    # TODO: Generate IPv4s from specified classes
-    source_ip = '{}.{}.{}.{}'.format(
-        *__import__('random').sample(range(0, 255), 4))
+    # Generate new user - ip, seldomly
+    if (random.random() > 0.93):
+        generate_username_and_ip()    
+    
+    # Microsecond part is not required in the PDR, hide
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    
     event_type = random.choice(
         ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "REQUEST"])
-
-    username = None
-    if event_type.startswith("LOGIN"):
-        username = random.choice(
-            ["admin", "karahan", "ahmet", generate_username()])
+    
+    username = random.choice(list(user_ip_dict.keys()))
+    if not event_type.startswith("LOGIN"):
+        username = None
+    source_ip = user_ip_dict[username]
 
     query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username)"
     values = [
