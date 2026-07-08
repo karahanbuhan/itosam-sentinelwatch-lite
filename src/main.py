@@ -81,7 +81,7 @@ async def insert_mock_event():
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     
     event_type = random.choice(
-        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "REQUEST"])
+        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "HIGH_MEMORY", "HIGH_DISK", "BANDWIDTH_LIMIT", "REQUEST"])
     
     username = random.choice(list(user_ip_dict.keys()))
     if not event_type.startswith("LOGIN"):
@@ -123,6 +123,6 @@ def api_alerts():
         "type": "BRUTE_FORCE",
         "severity": "high",
         "sourceIp": "185.23.11.4",
-        "description": "185.23.11.4 adresinden 5 dakikada 6 basarisiz giris denemesi"
+        "description": "185.23.11.4 adresi,01nden 5 dakikada 6 basarisiz giris denemesi"
     }
 ]""")
