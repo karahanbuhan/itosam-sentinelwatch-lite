@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import string
 import ipaddress
 import random
@@ -47,7 +47,7 @@ async def database_connect():
                     source_ip TEXT NOT NULL,
                     event_type TEXT NOT NULL,
                     username TEXT
-                )"""
+                );"""
     await database.execute(query)
 
 
@@ -88,7 +88,7 @@ async def insert_mock_event():
         username = None
     source_ip = user_ip_dict[username]
 
-    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username)"
+    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
         {
             "timestamp": timestamp,
@@ -115,14 +115,25 @@ async def api_events():
     results = await database.fetch_all(query=query)
     return results
 
+async def select_events_before(dminutes, event_type):
+    dtime = datetime.now(timezone.utc).replace(microsecond=0)
+    dtime = dtime - timedelta(minutes=dminutes)
+    dtime = dtime.isoformat()
+    
+    query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
+    values = { "event_type": event_type, "dtime": dtime }
+    print(query, values)
+    results = await database.fetch_all(query=query, values=values)
+    
+    d = []
+    for result in results:
+        d.append(dict(zip(result.keys(), result.values())))    
+    return d
+
+async def check_brute_force():
+    return await select_events_before(dminutes=5, event_type="LOGIN_FAILED")
 
 @app.get("/api/alerts")
-def api_alerts():
-    return json.loads("""[
-    {
-        "type": "BRUTE_FORCE",
-        "severity": "high",
-        "sourceIp": "185.23.11.4",
-        "description": "185.23.11.4 adresi,01nden 5 dakikada 6 basarisiz giris denemesi"
-    }
-]""")
+async def api_alerts():
+    results = await check_brute_force()
+    return results
