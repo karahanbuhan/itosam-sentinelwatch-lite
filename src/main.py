@@ -126,7 +126,6 @@ async def select_events_before(dminutes, event_type):
     
     query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
     values = { "event_type": event_type, "dtime": dtime }
-    print(query, values)
     results = await database.fetch_all(query=query, values=values)
     
     d = []
@@ -135,9 +134,32 @@ async def select_events_before(dminutes, event_type):
     return d
 
 async def check_brute_force():
-    return await select_events_before(dminutes=5, event_type="LOGIN_FAILED")
+    events = await select_events_before(dminutes=5, event_type="LOGIN_FAILED")
+    
+    attackers = {}
+    ip_counter = {}
+    for event in events:
+        if event["source_ip"] not in ip_counter:
+            ip_counter[event["source_ip"]] = 0
+        ip_counter[event["source_ip"]] += 1
+    
+    for ip in ip_counter:
+        count = ip_counter[ip]
+        if count > 5:
+            attackers[event["source_ip"]] = count
+        
+    return attackers
 
 @app.get("/api/alerts")
 async def api_alerts():
-    results = await check_brute_force()
-    return results
+    results = []    
+    attackers = await check_brute_force()
+    for attacker in attackers:
+        results.append({
+            "type": "BRUTE_FORCE",
+            "severity": "HIGH",
+            "source_ip": attacker,
+            "desription": f"{attacker} adresinden 5 dakikada {attackers} basarisiz giris"
+        })
+                
+    return json.dumps(results)
