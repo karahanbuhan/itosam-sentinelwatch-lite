@@ -1,9 +1,10 @@
 import json
-import datetime
+from datetime import datetime, timezone, timedelta
 import string
 import ipaddress
 import random
 import sys
+import csv
 
 
 from fastapi import FastAPI
@@ -11,12 +12,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 from databases import Database
 
+# Store usernames for generating mock data
+usernames = []
+with open("./resources/datasets/github_users.csv", newline="", encoding="utf-8") as csvfile:
+    github_users_reader = csv.reader(csvfile, delimiter=" ")
+    for row in github_users_reader:
+        username = " ".join(row).split(",")[0]
+        
+        if len(username) > 32 or not username.isalnum():
+            continue
+        
+        usernames.append(username)
 
 # Database setup
 database = Database("sqlite:///database.db")
 
+# Fast API setup
 app = FastAPI()
-
+# Origins used for CORS
 origins = [
     "http://localhost",
     "http://localhost:8000",
@@ -34,39 +47,53 @@ async def database_connect():
                     source_ip TEXT NOT NULL,
                     event_type TEXT NOT NULL,
                     username TEXT
-                )"""
+                );"""
     await database.execute(query)
 
 
 @app.on_event("shutdown")
 async def database_disconnect():
-    await database.disconnect()
+    await database.disconnect()    
 
+def generate_random_ipv4():
+    octet1 = random.randint(0, 223) # IPv4 classes A, B and C are used
+    octet2 = random.randint(0, 255)
+    octet3 = random.randint(0, 255)
+    octet4 = random.randint(0, 255)
+    return f"{octet1}.{octet2}.{octet3}.{octet4}"
 
-def generate_username():
-    characters = string.ascii_letters + string.digits + '._-'
-    username = ''.join(random.choice(characters)
-                       for _ in range(random.randint(5, 32)))
-    return username
-
+# Map user - ip relation so in mock system, it looks like same user connects with same ip address. Add to the dict in background
+users = { "admin": "183.43.14.251" }
+def generate_user():    
+    users[random.choice(usernames)] = generate_random_ipv4()
+# Generate 10 users for initial startup
+for i in range(0, 10):
+    generate_user()
 
 @app.on_event("startup")
 @repeat_every(seconds=2)
-async def insert_mock_event():
-    timestamp = datetime.datetime.now(
-        datetime.timezone.utc).replace(microsecond=0).isoformat()
-    # TODO: Generate IPv4s from specified classes
-    source_ip = '{}.{}.{}.{}'.format(
-        *__import__('random').sample(range(0, 255), 4))
+async def insert_mock_event():    
+    rand = random.random()    
+    if rand > 0.93:
+        generate_user() # Generate new user, seldomly
+    elif rand < 0.27:
+        users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
+    
+    # Microsecond part is not required in the PDR, hide
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    
     event_type = random.choice(
-        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "REQUEST"])
+        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "HIGH_MEMORY", "HIGH_DISK", "BANDWIDTH_LIMIT", "REQUEST"]
+    )
+    
+    username = random.choice(list(users.keys()))
+    if not event_type.startswith("LOGIN"):
+        username = None
+        source_ip = generate_random_ipv4()
+    else:
+        source_ip = users[username]
 
-    username = None
-    if event_type.startswith("LOGIN"):
-        username = random.choice(
-            ["admin", "karahan", "ahmet", generate_username()])
-
-    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username)"
+    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
         {
             "timestamp": timestamp,
@@ -75,7 +102,6 @@ async def insert_mock_event():
             "username": username
         }
     ]
-
     await database.execute_many(query=query, values=values)
 
 app.add_middleware(
@@ -93,14 +119,47 @@ async def api_events():
     results = await database.fetch_all(query=query)
     return results
 
+async def select_events_before(dminutes, event_type):
+    dtime = datetime.now(timezone.utc).replace(microsecond=0)
+    dtime = dtime - timedelta(minutes=dminutes)
+    dtime = dtime.isoformat()
+    
+    query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
+    values = { "event_type": event_type, "dtime": dtime }
+    results = await database.fetch_all(query=query, values=values)
+    
+    d = []
+    for result in results:
+        d.append(dict(zip(result.keys(), result.values())))    
+    return d
+
+async def check_brute_force():
+    events = await select_events_before(dminutes=25, event_type="LOGIN_FAILED")
+    
+    attackers = {}
+    ip_counter = {}
+    for event in events:
+        if event["source_ip"] not in ip_counter:
+            ip_counter[event["source_ip"]] = 0
+        ip_counter[event["source_ip"]] += 1
+    
+    for ip in ip_counter:
+        count = ip_counter[ip]
+        if count > 5:
+            attackers[event["source_ip"]] = count
+        
+    return attackers
 
 @app.get("/api/alerts")
-def api_alerts():
-    return json.loads("""[
-    {
-        "type": "BRUTE_FORCE",
-        "severity": "high",
-        "sourceIp": "185.23.11.4",
-        "description": "185.23.11.4 adresinden 5 dakikada 6 basarisiz giris denemesi"
-    }
-]""")
+async def api_alerts():
+    results = []    
+    attackers = await check_brute_force()
+    for attacker in attackers:
+        results.append({
+            "type": "BRUTE_FORCE",
+            "severity": "HIGH",
+            "source_ip": attacker,
+            "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
+        })
+                
+    return results
