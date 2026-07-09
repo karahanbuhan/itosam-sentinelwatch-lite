@@ -52,5 +52,7 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 ```
 
 ## Kullanılan Teknolojiler
-Back-end'de Python ve FastAPI kullanılmıştır, veritabanında SQLite3 yeterli görülmüştür.
-Front-end'de React (Vite) ve Tailwind CSS kullanılmıştır.
+- FastAPI (Python)
+- SQLite3
+- React (Vite)
+- Tailwind CSS
