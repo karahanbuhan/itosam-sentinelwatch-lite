@@ -55,7 +55,7 @@ async def database_connect():
 async def database_disconnect():
     await database.disconnect()    
 
-def generate_random_ip():
+def generate_random_ipv4():
     octet1 = random.randint(0, 223) # IPv4 classes A, B and C are used
     octet2 = random.randint(0, 255)
     octet3 = random.randint(0, 255)
@@ -63,32 +63,35 @@ def generate_random_ip():
     return f"{octet1}.{octet2}.{octet3}.{octet4}"
 
 # Map user - ip relation so in mock system, it looks like same user connects with same ip address. Add to the dict in background
-user_ip_dict = { "admin": "183.43.14.251" }
+users = { "admin": "183.43.14.251" }
 def generate_user():    
-    user_ip_dict[random.choice(usernames)] = generate_random_ip()
+    users[random.choice(usernames)] = generate_random_ipv4()
 # Generate 10 users for initial startup
 for i in range(0, 10):
     generate_user()
 
 @app.on_event("startup")
 @repeat_every(seconds=2)
-async def insert_mock_event():
-    # Generate new user - ip, seldomly
-    if (random.random() > 0.93):
-        generate_user()    
+async def insert_mock_event():    
+    rand = random.random()    
+    if rand > 0.93:
+        generate_user() # Generate new user, seldomly
+    elif rand < 0.27:
+        users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
     
     # Microsecond part is not required in the PDR, hide
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     
     event_type = random.choice(
-        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "HIGH_MEMORY", "HIGH_DISK", "BANDWIDTH_LIMIT", "REQUEST"])
+        ["LOGIN_FAILED", "LOGIN_SUCCESS", "HIGH_CPU", "HIGH_MEMORY", "HIGH_DISK", "BANDWIDTH_LIMIT", "REQUEST"]
+    )
     
-    username = random.choice(list(user_ip_dict.keys()))
+    username = random.choice(list(users.keys()))
     if not event_type.startswith("LOGIN"):
         username = None
-        source_ip = generate_random_ip()
+        source_ip = generate_random_ipv4()
     else:
-        source_ip = user_ip_dict[username]
+        source_ip = users[username]
 
     query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
