@@ -116,7 +116,7 @@ export default function Dashboard() {
         {/* Canlı Log Akışı Kartı */}
         <div className="log-card">
           <div className="border-b border-slate-100 pb-3 mb-3 flex justify-between items-center">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">Aktivite Akışı</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">Canlı Olay Akışı</h2>
             <span className="bg-blue-50 text-green-600 border border-:dark-green-100 text-[9px] px-2 py-0.5 rounded-md font-mono font-bold tracking-wider">
               CANLI
             </span>
@@ -130,18 +130,18 @@ export default function Dashboard() {
                 if (type === "LOGIN_FAILED") badgeStyle = "text-red-700 bg-red-50 border-red-100";
                 if (type === "HIGH_CPU") badgeStyle = "text-amber-700 bg-amber-50 border-amber-200/60";
                 if (type === "LOGIN_SUCCESS") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
-                if (type === "HIGH_MEMORY") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
-                if (type === "HIGH_DISK") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
-                if (type === "BANDWIDTH_LIMIT") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
-                if (type === "REQUEST") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
-
+                if (type === "HIGH_MEMORY") badgeStyle = "text-orange-700 bg-orange-50 border border-orange-100";
+                if (type === "HIGH_DISK") badgeStyle = "text-indigo-700 bg-indigo-50 border border-indigo-100";
+                if (type === "BANDWIDTH_LIMIT") badgeStyle = "text-amber-700 bg-amber-50 border border-amber-100";
+                if (type === "REQUEST") badgeStyle = "text-purple-700 bg-purple-50 border border-purple-100";
 
                 const formattedTime = event.timestamp ? new Date(event.timestamp).toLocaleTimeString('tr-TR') : '14:32';
 
                 return (
                   <div className="log-row" key={event.id || index}>
                     <div className="flex flex-col gap-1.5">
-                      <span className={`log-badge-base ${badgeStyle}`}>{type}</span>
+                      {/* -ml-2 verilerek kutular sola kaydırıldı ve IP metniyle optik olarak hizalandı */}
+                      <span className={`log-badge-base w-fit -ml-1 ${badgeStyle}`}>{type}</span>
                       <div className="text-[11px] text-slate-500 font-medium">
                         IP: <span className="text-slate-700 font-mono">{event.source_ip || '0.0.0.0'}</span> {event.username && `| Usr: ${event.username}`}
                       </div>
@@ -155,14 +155,14 @@ export default function Dashboard() {
               <>
                 <div className="log-row">
                   <div className="flex flex-col gap-1.5">
-                    <span className="log-badge-base text-red-700 bg-red-50 border-red-100">LOGIN_FAILED</span>
+                    <span className="log-badge-base w-fit -ml-2 text-red-700 bg-red-50 border-red-100">LOGIN_FAILED</span>
                     <div className="text-[11px] text-slate-500 font-medium">IP: 185.23.11.4 | Usr: admin</div>
                   </div>
                   <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">14:32:10</span>
                 </div>
                 <div className="log-row">
                   <div className="flex flex-col gap-1.5">
-                    <span className="log-badge-base text-slate-500 bg-slate-50 border-slate-200/60">REQUEST</span>
+                    <span className="log-badge-base w-fit -ml-2 text-slate-500 bg-slate-50 border-slate-200/60">REQUEST</span>
                     <div className="text-[11px] text-slate-500 font-medium">IP: 91.44.10.2 | Usr: -</div>
                   </div>
                   <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">14:32:08</span>
