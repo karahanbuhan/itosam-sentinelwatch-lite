@@ -1,7 +1,8 @@
 import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-export default function EventChart({ events = [] }) {
+// isDarkMode prop'unu ekledik, varsayılan olarak false bıraktık
+export default function EventChart({ events = [], isDarkMode = false }) {
   
   const processData = () => {
     if (!events || events.length === 0) {
@@ -39,32 +40,39 @@ export default function EventChart({ events = [] }) {
 
   const chartData = processData();
 
+
+  const strokeColor = isDarkMode ? '#38bdf8' : '#2563eb'; 
+  const gridColor = isDarkMode ? '#334155' : '#f1f5f9';      
+  const tooltipBg = isDarkMode ? '#1e293b' : '#ffffff';      
+  const tooltipBorder = isDarkMode ? '#334155' : '#e2e8f0';  
+  const textColor = isDarkMode ? '#94a3b8' : '#64748b';      
+
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <ResponsiveContainer width="100%" height={360}>
         <LineChart data={chartData} margin={{ top: 15, right: 15, left: -25, bottom: 5 }}>
-          {/* Açık gri, minimal arka plan çizgileri */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+
+          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
           
           <XAxis dataKey="time" stroke="#94a3b8" style={{ fontSize: '10px', fontWeight: '500' }} />
           <YAxis stroke="#94a3b8" style={{ fontSize: '10px', fontWeight: '500' }} allowDecimals={false} />
           
-          {/* Temiz, beyaz gölgeli Tooltip yapısı */}
+
           <Tooltip 
-            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}
-            labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
+            contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: '8px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.05)' }}
+            labelStyle={{ fontWeight: 'bold', color: isDarkMode ? '#ffffff' : '#1e293b' }}
           />
           
-          <Legend wrapperStyle={{ fontSize: '11px', color: '#64748b', paddingTop: '5px' }} />
+          <Legend wrapperStyle={{ fontSize: '11px', color: textColor, paddingTop: '5px' }} />
           
-          {/* Safir Mavisi Çizgi */}
+   
           <Line 
             type="monotone" 
             dataKey="Olay Sayısı" 
-            stroke="#2563eb" 
+            stroke={strokeColor} 
             strokeWidth={2.5}
-            dot={{ fill: '#ffffff', stroke: '#2563eb', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, fill: '#2563eb' }} 
+            dot={{ fill: isDarkMode ? '#0f172a' : '#ffffff', stroke: strokeColor, strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: strokeColor }} 
           />
         </LineChart>
       </ResponsiveContainer>
