@@ -130,6 +130,11 @@ export default function Dashboard() {
                 if (type === "LOGIN_FAILED") badgeStyle = "text-red-700 bg-red-50 border-red-100";
                 if (type === "HIGH_CPU") badgeStyle = "text-amber-700 bg-amber-50 border-amber-200/60";
                 if (type === "LOGIN_SUCCESS") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
+                if (type === "HIGH_MEMORY") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
+                if (type === "HIGH_DISK") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
+                if (type === "BANDWIDTH_LIMIT") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
+                if (type === "REQUEST") badgeStyle = "text-emerald-700 bg-emerald-50 border-emerald-100";
+
 
                 const formattedTime = event.timestamp ? new Date(event.timestamp).toLocaleTimeString('tr-TR') : '14:32';
 
