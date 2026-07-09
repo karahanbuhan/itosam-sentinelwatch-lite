@@ -125,7 +125,7 @@ export default function Dashboard() {
           <div className="log-list-wrapper">
             {sortedEvents.length > 0 ? (
               sortedEvents.map((event, index) => {
-                const type = event.eventType || event.type;
+                const type = event.event_type || event.type;
                 let badgeStyle = "text-slate-500 bg-slate-50 border-slate-200/60";
                 if (type === "LOGIN_FAILED") badgeStyle = "text-red-700 bg-red-50 border-red-100";
                 if (type === "HIGH_CPU") badgeStyle = "text-amber-700 bg-amber-50 border-amber-200/60";
@@ -143,7 +143,7 @@ export default function Dashboard() {
                     <div className="flex flex-col gap-1.5">
                       <span className={`log-badge-base ${badgeStyle}`}>{type}</span>
                       <div className="text-[11px] text-slate-500 font-medium">
-                        IP: <span className="text-slate-700 font-mono">{event.sourceIp || '0.0.0.0'}</span> {event.username && `| Usr: ${event.username}`}
+                        IP: <span className="text-slate-700 font-mono">{event.source_ip || '0.0.0.0'}</span> {event.username && `| Usr: ${event.username}`}
                       </div>
                     </div>
                     <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-0.5 rounded border border-slate-100">{formattedTime}</span>
