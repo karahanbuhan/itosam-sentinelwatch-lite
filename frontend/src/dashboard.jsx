@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import './style.css'; // CSS dosyan doğrudan bağlanıyor
+import EventChart from './EventChart.jsx';
 
 export default function Dashboard() {
-  // PRD standartlarına tam uyumlu React state'lerimiz
   const [events, setEvents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
-    // 5 saniyede bir tetiklenecek olan Polling fonksiyonu
     const fetchData = async () => {
       try {
-        // 1. Canlı Olayları Çek (GET /api/events)
         const eventsResponse = await fetch('/api/events');
         const eventsData = await eventsResponse.json();
         setEvents(eventsData);
 
-        // 2. Aktif Alarmları Çek (GET /api/alerts)
         const alertsResponse = await fetch('/api/alerts');
         const alertsData = await alertsResponse.json();
         setAlerts(alertsData);
@@ -25,43 +21,30 @@ export default function Dashboard() {
       }
     };
 
-    // Sayfa ilk açıldığında verileri hemen çekmesi için ilk tetikleme
     fetchData();
-
-    // PRD Gereksinimi: WebSocket yok, her 5 saniyede bir polling (5000 ms)
     const interval = setInterval(fetchData, 5000);
-
-    // Bileşen kapandığında hafıza sızıntısı olmaması için interval'i temizliyoruz
     return () => clearInterval(interval);
   }, []);
 
-  // Dropdown filtresine göre log listesini süzüyoruz
   const filteredEvents = events.filter(event => {
     if (filter === 'ALL') return true;
     return event.eventType === filter;
   });
 
+  const sortedEvents = [...filteredEvents].reverse();
+
   return (
-    <div className="dashboard-body">
+    <div className="dashboard-container">
 
       <header className="main-header">
         <div>
-          <h1 className="project-title">
-            SentinelWatch Lite
-          </h1>
-          <p className="project-subtitle">
-            Sistem İzleme ve Anomali Tespit Paneli
-          </p>
+          <h1 className="baslik">SentinelWatch Lite</h1>
+          <p className="text-xs text-gray-500 mt-0.5">Sistem İzleme ve Anomali Tespit Paneli</p>
         </div>
 
-        <div className="filter-container">
-          <span className="filter-label">Filtre:</span>
-          {/* Select değiştikçe filter state'imizi güncelliyoruz */}
-          <select 
-            className="filter-select"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-gray-500">Filtre:</span>
+          <select className="filter-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="ALL">Tüm Olaylar</option>
             <option value="LOGIN_FAILED">Başarısız Giriş</option>
             <option value="LOGIN_SUCCESS">Başarılı Giriş</option>
@@ -71,19 +54,13 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Alarm Kutusunu Güncelleme Alanı */}
-      {/* Backend'den aktif alarm gelirse dinamik içerik basılır, henüz bağlanmadıysa senin orijinal statik alarmın ekranda kalır */}
       {alerts.length > 0 ? (
         <div className="alarm-box">
-          <div className="alarm-content">
-            <span className="alarm-icon">⚠️</span>
+          <div className="flex items-center gap-3">
+            <span className="text-red-600 text-lg">⚠️</span>
             <div>
-              <span className="alarm-title">
-                Kritik Alarm: {alerts[0].type} Tespit Edildi
-              </span>
-              <p className="alarm-desc">
-                {alerts[0].description}
-              </p>
+              <span className="font-bold text-red-800 text-sm">Kritik Alarm: {alerts[0].type} Tespit Edildi</span>
+              <p className="text-xs text-red-700 mt-0.5">{alerts[0].description}</p>
             </div>
           </div>
           <span className="alarm-badge">
@@ -92,87 +69,80 @@ export default function Dashboard() {
         </div>
       ) : (
         <div className="alarm-box">
-          <div className="alarm-content">
-            <span className="alarm-icon">⚠️</span>
+          <div className="flex items-center gap-3">
+            <span className="text-red-600 text-lg">⚠️</span>
             <div>
-              <span className="alarm-title">
-                Kritik Alarm: BRUTE_FORCE Tespit Edildi
-              </span>
-              <p className="alarm-desc">
-                185.23.11.4 IP adresinden son 5 dakikada 6 başarısız giriş yapıldı.
-              </p>
+              <span className="font-bold text-red-800 text-sm">Kritik Alarm: BRUTE_FORCE Tespit Edildi</span>
+              <p className="text-xs text-red-700 mt-0.5">185.23.11.4 IP adresinden son 5 dakikada 10 başarısız giriş yapıldı.</p>
             </div>
           </div>
-          <span className="alarm-badge">
-            Yüksek Seviye
-          </span>
+          <span className="alarm-badge">Yüksek Seviye</span>
         </div>
       )}
 
-      <div className="main-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <div className="chart-card">
           <div>
-            <h2 className="card-title">Olay Yoğunluğu Zaman Grafiği</h2>
-            <p className="card-desc">Dakikalık bazda sisteme düşen log sayıları</p>
+            <h2 className="text-sm font-bold text-gray-900">Olay Yoğunluğu Zaman Grafiği</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Dakikalık bazda sisteme düşen log sayıları</p>
           </div>
-          
-          <div className="chart-placeholder">
-            [ Recharts Çizgi Grafiği Buraya Gelecek ]
+          <div className="chart-wrapper">
+            <EventChart events={events} />
           </div>
         </div>
 
         <div className="log-card">
-          <div className="log-header">
-            <h2 className="card-title">Canlı Olay Akışı</h2>
-            <span className="live-badge">CANLI</span>
+          <div className="border-b border-gray-100 pb-2 mb-3 flex justify-between items-center">
+            <h2 className="text-sm font-bold text-gray-900">Canlı Olay Akışı</h2>
+            <span className="bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded font-mono font-bold animate-pulse">CANLI</span>
           </div>
 
-          <div className="log-list">
-            {/* Backend'den dinamik veri geldiyse onları listele, yoksa ilk baştaki orijinal 3 statik logu göster */}
-            {filteredEvents.length > 0 ? (
-              filteredEvents.map((event, index) => {
-                let badgeClass = "badge-request";
-                if (event.eventType === "LOGIN_FAILED") badgeClass = "badge-failed";
-                if (event.eventType === "HIGH_CPU") badgeClass = "badge-cpu";
+          <div className="log-list-wrapper">
+            {sortedEvents.length > 0 ? (
+              sortedEvents.map((event, index) => {
+                let badgeStyle = "text-gray-600 bg-gray-100 border-gray-200";
+                if (event.eventType === "LOGIN_FAILED") badgeStyle = "text-red-600 bg-red-50 border-red-100";
+                if (event.eventType === "HIGH_CPU") badgeStyle = "text-amber-600 bg-amber-50 border-amber-100";
 
                 const formattedTime = new Date(event.timestamp).toLocaleTimeString('tr-TR');
 
                 return (
-                  <div className="log-item" key={event.id || index}>
-                    <div className="log-info">
-                      <span className={badgeClass}>{event.eventType}</span>
-                      <div className="log-meta">IP: {event.sourceIp} | User: {event.username || '-'}</div>
+                  <div className="log-row" key={event.id || index}>
+                    <div className="flex flex-col gap-1">
+                      <span className={`log-badge-base ${badgeStyle}`}>{event.eventType}</span>
+                      <div className="text-xs text-gray-500 font-medium">
+                        IP: {event.sourceIp} | User: {event.username || '-'}
+                      </div>
                     </div>
-                    <span className="log-time">{formattedTime}</span>
+                    <span className="text-xs text-gray-400 font-mono">{formattedTime}</span>
                   </div>
                 );
               })
             ) : (
-              /* Backend bağlanana kadar arayüzün pürüzsüz durmasını sağlayan orijinal logların */
               <>
-                <div className="log-item">
-                  <div className="log-info">
-                    <span className="badge-failed">LOGIN_FAILED</span>
-                    <div className="log-meta">IP: 185.23.11.4 | User: admin</div>
+                <div className="log-row">
+                  <div className="flex flex-col gap-1">
+                    <span className="log-badge-base text-red-600 bg-red-50 border-red-100">LOGIN_FAILED</span>
+                    <div className="text-xs text-gray-500 font-medium">IP: 185.23.11.4 | User: admin</div>
                   </div>
-                  <span className="log-time">14:32:10</span>
+                  <span className="text-xs text-gray-400 font-mono">14:32:10</span>
                 </div>
 
-                <div className="log-item">
-                  <div className="log-info">
-                    <span className="badge-request">REQUEST</span>
-                    <div className="log-meta">IP: 91.44.10.2 | User: -</div>
+                <div className="log-row">
+                  <div className="flex flex-col gap-1">
+                    <span className="log-badge-base text-gray-600 bg-gray-100 border-gray-200">REQUEST</span>
+                    <div className="text-xs text-gray-500 font-medium">IP: 91.44.10.2 | User: -</div>
                   </div>
-                  <span className="log-time">14:32:08</span>
+                  <span className="text-xs text-gray-400 font-mono">14:32:08</span>
                 </div>
 
-                <div className="log-item">
-                  <div className="log-info">
-                    <span className="badge-cpu">HIGH_CPU</span>
-                    <div className="log-meta">IP: 127.0.0.1 | User: system</div>
+                <div className="log-row">
+                  <div className="flex flex-col gap-1">
+                    <span className="log-badge-base text-amber-600 bg-amber-50 border-amber-100">HIGH_CPU</span>
+                    <div className="text-xs text-gray-500 font-medium">IP: 127.0.0.1 | User: system</div>
                   </div>
-                  <span className="log-time">14:31:55</span>
+                  <span className="text-xs text-gray-400 font-mono">14:31:55</span>
                 </div>
               </>
             )}
