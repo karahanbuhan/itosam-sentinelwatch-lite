@@ -1,10 +1,10 @@
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { RechartsDevtools } from '@recharts/devtools';
 import './style.css';
-import Dashboard from './src/main.jsx'
-import Main from './src/main.jsx'
+import Dashboard from './main.js'
+import Main from './main.js'
 
-
+// #region Sample data
 const data = [
   {
     name: 'A',

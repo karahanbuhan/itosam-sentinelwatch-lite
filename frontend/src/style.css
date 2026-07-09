@@ -1,61 +1,59 @@
 @import "tailwindcss";
 
-
+/* Genel Sayfa Düzeni - Ferah ve Kurumsal Açık Tema */
 .dashboard-container {
-  @apply bg-gray-50 text-gray-800 p-6 min-h-screen font-sans;
+  @apply bg-[#f8fafc] text-slate-800 p-6 min-h-screen font-sans antialiased;
 }
 
-
+/* Üst Başlık Alanı */
 .main-header {
-  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-200 pb-4 mb-6;
+  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200/80 pb-5 mb-6;
 }
 
+/* Modern Açık Tema Dropdown */
 .filter-select {
-  @apply bg-white border border-gray-300 text-gray-700 text-sm rounded px-3 py-1.5 outline-none cursor-pointer focus:border-blue-500;
+  @apply bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm;
 }
 
-
+/* Dikkat Çekici Ama Göz Yormayan Alarm Kutusu */
 .alarm-box {
-  @apply mb-6 bg-red-50 border border-red-200 rounded p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-2;
+  @apply mb-6 bg-red-50/60 border border-red-200/80 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm backdrop-blur-md;
 }
 
 .alarm-badge {
-  @apply bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded;
+  @apply bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border border-red-200/50;
 }
 
-
-.chart-card {
-  @apply bg-white border border-gray-200 rounded p-5 flex flex-col min-h-[550px] justify-between shadow-sm;
+/* Sade ve Premium Kart Yapısı */
+.chart-card, .log-card {
+  @apply bg-white border border-slate-200/70 rounded-xl p-5 flex flex-col h-[520px] shadow-sm hover:shadow-md/50 transition-all;
 }
 
 .chart-wrapper {
-  @apply flex-1 min-h-[420px] mt-4 bg-gray-50 border border-gray-200 rounded border-dashed flex items-center justify-center text-xs text-gray-400;
-}
-
-.log-card {
-  @apply bg-white border border-gray-200 rounded p-5 flex flex-col h-[550px] shadow-sm;
+  @apply flex-1 min-h-[380px] mt-4 bg-slate-50/50 border border-slate-100 rounded-lg p-2;
 }
 
 .log-list-wrapper {
-  @apply overflow-y-auto flex-1 pr-1 space-y-3;
+  @apply overflow-y-auto flex-1 pr-1 space-y-2.5;
 }
 
-
+/* Temiz ve Okunabilir Log Satırları */
 .log-row {
-  @apply flex justify-between items-center border-b border-gray-50 pb-2 last:border-0;
+  @apply flex justify-between items-center bg-white border border-slate-100 rounded-lg p-3 hover:bg-slate-50 hover:border-slate-200/60 transition-all shadow-sm/5;
 }
 
 .log-badge-base {
-  @apply font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border w-max;
+  @apply font-mono text-[10px] font-bold px-2 py-0.5 rounded border tracking-wide uppercase;
 }
 
-
-.baslik {
-  text-align: center;
-  color: rgb(59, 130, 246);
-  font-size: 20px;
-  font-family: sans-serif;
-  font-style: italic;
-  font-weight: 700;
-  margin-left: -1vh;
+/* Zarif Scrollbar (Log listesi için) */
+.log-list-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+.log-list-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+.log-list-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
 }
