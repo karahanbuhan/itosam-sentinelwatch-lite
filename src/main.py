@@ -134,7 +134,7 @@ async def select_events_before(dminutes, event_type):
     return d
 
 async def check_brute_force():
-    events = await select_events_before(dminutes=5, event_type="LOGIN_FAILED")
+    events = await select_events_before(dminutes=25, event_type="LOGIN_FAILED")
     
     attackers = {}
     ip_counter = {}
@@ -159,7 +159,7 @@ async def api_alerts():
             "type": "BRUTE_FORCE",
             "severity": "HIGH",
             "source_ip": attacker,
-            "desription": f"{attacker} adresinden 5 dakikada {attackers} basarisiz giris"
+            "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
         })
                 
     return results
