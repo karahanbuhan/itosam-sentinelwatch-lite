@@ -162,4 +162,4 @@ async def api_alerts():
             "desription": f"{attacker} adresinden 5 dakikada {attackers} basarisiz giris"
         })
                 
-    return json.dumps(results)
+    return results
