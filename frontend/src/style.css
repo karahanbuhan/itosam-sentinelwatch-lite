@@ -1,15 +1,16 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-
+/* Genel Sayfa Düzeni - Ferah ve Kurumsal Açık Tema */
 .dashboard-container {
   @apply bg-[#f8fafc] text-slate-800 p-6 min-h-screen font-sans antialiased;
 }
-
+/* Koyu Tema Arka Planı ve Metin Rengi */
 .dark .dashboard-container {
   @apply bg-[#0f172a] text-slate-100;
 }
 
+/* Üst Başlık Alanı */
 .main-header {
   @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200/80 pb-5 mb-6;
 }
@@ -17,7 +18,7 @@
   @apply border-slate-800;
 }
 
-
+/* Modern Açık Tema Dropdown */
 .filter-select {
   @apply bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm;
 }
@@ -25,28 +26,25 @@
   @apply bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-0;
 }
 
-
+/* Yapısal Alarm Kutusu Özellikleri (Renkler JS'den Yönetiliyor) */
 .alarm-box {
-  @apply mb-6 bg-red-50/60 border border-red-200/80 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm backdrop-blur-md;
-}
-.dark .alarm-box {
-  @apply bg-red-950/20 border-red-900/60;
+  @apply mb-6 border rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm backdrop-blur-md;
 }
 
 .alarm-badge {
-  @apply bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border border-red-200/50;
+  @apply text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border;
 }
 
-
+/* Sade ve Premium Kart Yapısı */
 .chart-card, .log-card {
-  @apply bg-white border border-slate-200/70 rounded-xl p-5 flex flex-col h-[520px] shadow-sm hover:shadow-md/50 transition-all;
+  @apply bg-white border border-slate-200/70 rounded-xl p-5 flex flex-col h-[80vh] shadow-sm hover:shadow-md/50 transition-all;
 }
 .dark .chart-card, .dark .log-card {
   @apply bg-slate-900 border-slate-800 hover:shadow-none;
 }
 
 .chart-wrapper {
-  @apply flex-1 min-h-[380px] mt-4 bg-slate-50/50 border border-slate-100 rounded-lg p-2;
+  @apply flex-1 min-h-[68vh] mt-4 bg-slate-50/50 border border-slate-100 rounded-lg p-2;
 }
 .dark .chart-wrapper {
   @apply bg-slate-950/40 border-slate-800;
@@ -56,7 +54,7 @@
   @apply overflow-y-auto flex-1 pr-1 space-y-2.5;
 }
 
-
+/* Temiz ve Okunabilir Log Satırları */
 .log-row {
   @apply flex justify-between items-center bg-white border border-slate-100 rounded-lg p-3 hover:bg-slate-50 hover:border-slate-200/60 transition-all shadow-sm/5;
 }
@@ -68,7 +66,7 @@
   @apply font-mono text-[10px] font-bold px-2 py-0.5 rounded border tracking-wide uppercase;
 }
 
-
+/* Zarif Scrollbar (Log listesi için) */
 .log-list-wrapper::-webkit-scrollbar {
   width: 5px;
 }
