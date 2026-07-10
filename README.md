@@ -5,8 +5,11 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 <img width="1279" height="695" alt="Screenshot 2026-07-09 163127" src="https://github.com/user-attachments/assets/7726284c-b753-476f-a47a-13dd08a2b634" />
 <img width="1279" height="694" alt="Screenshot 2026-07-09 163116" src="https://github.com/user-attachments/assets/3b3449c5-7bb7-452f-97d4-ef967fd6f746" />
 
-## Kurulum & Çalıştırma
-SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Önceki gerekli kütüphane ve framework'lerin yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
+## Kullanılan Teknolojiler
+- FastAPI (Python)
+- SQLite3
+- React (Vite)
+- Tailwind CSS
 
 ## Uç Noktaların JSON Formatları
 ### /api/events:
@@ -54,14 +57,9 @@ SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan
 ]
 ```
 
-## Kullanılan Teknolojiler
-- FastAPI (Python)
-- SQLite3
-- React (Vite)
-- Tailwind CSS
-
-### Kurulum & Çalıştırma
-#### Backend
+## Kurulum & Çalıştırma
+SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Öncelikle gerekli kütüphane ve framework'ler yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
+### Backend
 0. Bilgisayarınıza gerekli yazılımları yükleyin.
 Backend sunucusunu ayağa kaldırabilmek için bilgisayarınızda **git** ve **Python** yazılımlarının yüklü olması gerekmektedir. Proje geliştirilirken *git v2.53.0* ve *Python 3.14.3* kullanılmıştır ve minimum bu sürümlerin kullanılması tavsiye edilir.
 - https://git-scm.com/install/
@@ -71,25 +69,25 @@ Backend sunucusunu ayağa kaldırabilmek için bilgisayarınızda **git** ve **P
 git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
 cd itosam-sentinelwatch-lite
 ```
-2. Bir venv ortamı oluşturun. (Bazı kurulumlarda komut kullanırken python yerine python3 yazmanız gerekebilir.)
+2. Bir venv ortamı oluşturun. (Bazı kurulumlarda python yerine python3 yazmanız gerekebilir.)
 ```bash
 python -m venv .
 ```
-3. **(Windows için)** venv ortamını aktif edin.
-```bash
-.\Scripts\activate.bat
-```
-3. **(MacOS & Linux için)** venv ortamını aktif edin.
+3. Öncelikle venv ortamını aktif edin.
 ```bash
 .\Scripts\activate
 ```
 4. Gerekli Python kütüphanelerini yükleyin.
 ```bash
-pip install -r ./requirements.txt
+python -m pip install -r ./requirements.txt
 ```
-#### Frontend
+5. Sunucuyu FastAPI ile başlatın.
+```bash
+python -m fastapi dev ./src/main.py
+```
+### Frontend
 0. Bilgisayarınıza gerekli yazılımları yükleyin.
-Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi ve sunucunun çalıştırılabilmesi için **npm* kullanılmaktadır. Proje geliştirilirken *npm 11.16.0* kullanılmıştır ve minimum bu sürümün kullanılması tavsiye edilir.
+Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi ve sunucunun çalıştırılabilmesi için **npm** kullanılmaktadır. Proje geliştirilirken *npm 11.16.0* kullanılmıştır ve minimum bu sürümün ve Windows için kurulum yaparken NodeJS Installer kullanılması tavsiye edilir.
 - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 1. Frontend klasörünün içine girin.
 ```bash
