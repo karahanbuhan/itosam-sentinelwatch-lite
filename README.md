@@ -94,7 +94,7 @@ Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi
 - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 1. Frontend klasörünün içine girin.
 ```bash
-cd ./frontend
+cd frontend
 ```
 2. Proje için gerekli paketleri yükleyin.
 ```bash
