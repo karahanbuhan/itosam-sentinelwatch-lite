@@ -71,20 +71,19 @@ async def play_brute_force():
     source_ip = users[username]
     event_type = "LOGIN_FAILED"
     
-    timestamp = datetime.now(timezone.utc).replace(microsecond=0)
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0)    
+    timestamp = timestamp.isoformat()
+    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
+    values = [
+        {
+            "timestamp": timestamp,
+            "source_ip": source_ip,
+            "event_type": event_type,
+            "username": username
+        }
+    ]
     
-    for i in range(0, random.range(0, 7)):
-        timestamp = timestamp.second(1) + timestamp        
-        query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
-        values = [
-            {
-                "timestamp": timestamp,
-                "source_ip": source_ip,
-                "event_type": event_type,
-                "username": username
-            }
-        ]
-        print("Playing brute force")
+    for i in range(random.randint(5, 8)):
         await database.execute_many(query=query, values=values)
 
 @app.on_event("startup")
@@ -99,7 +98,8 @@ async def insert_mock_event():
         return # Sometimes skip so it is not perfectly linear
     
     ### DEMO SCRIPT ###
-        
+    if rand > 0.80 and rand < 0.87:
+        await play_brute_force()
     ### DEMO SCRIPT ###
     
     # Microsecond part is not required in the PDR, hide
