@@ -89,7 +89,7 @@ python -m pip install -r ./requirements.txt
 python -m fastapi dev ./src/main.py
 ```
 ### Frontend
-0. Bilgisayarınıza gerekli yazılımları yükleyin.
+0. Backend kurulum aşamasını tamamlayın ve bilgisayarınıza gerekli yazılımları yükleyin.
 Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi ve sunucunun çalıştırılabilmesi için **npm** kullanılmaktadır. Proje geliştirilirken *npm 11.16.0* kullanılmıştır ve minimum bu sürümün ve Windows için kurulum yaparken NodeJS Installer kullanılması tavsiye edilir.
 - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 1. Frontend klasörünün içine girin.
