@@ -53,6 +53,18 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
     "severity": "HIGH",
     "source_ip": "132.50.137.216",
     "description": "132.50.137.216 adresinden 5 dakikada 8 basarisiz giris"
+  },
+  {
+    "type": "TRAFFIC_SPIKE",
+    "severity": "MEDIUM",
+    "event_count": 104,
+    "description": "Son 1 dakika içerisinde 104 adet olay oldu, trafik limiti 100 asildi"
+  },
+  {  
+    "type": "HIGH_CPU",
+    "severity": "LOW",
+    "event_count": 17,
+    "description": "Son 2 dakika içerisinde 17 adet yüksek CPU kullanimi olayi olustu"
   }
 ]
 ```
