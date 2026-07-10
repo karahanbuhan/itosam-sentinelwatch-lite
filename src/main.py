@@ -102,6 +102,7 @@ async def insert_mock_event():
             "username": username
         }
     ]
+    
     await database.execute_many(query=query, values=values)
 
 app.add_middleware(
@@ -119,13 +120,17 @@ async def api_events():
     results = await database.fetch_all(query=query)
     return results
 
-async def select_events_before(dminutes, event_type):
+async def select_events_before(dminutes, event_type=None):
     dtime = datetime.now(timezone.utc).replace(microsecond=0)
     dtime = dtime - timedelta(minutes=dminutes)
     dtime = dtime.isoformat()
     
-    query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
-    values = { "event_type": event_type, "dtime": dtime }
+    query = "SELECT * FROM events WHERE (timestamp > :dtime);"
+    values = { "dtime": dtime }
+    if event_type != None:
+        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"        
+        values = { "event_type": event_type, "dtime": dtime }
+    
     results = await database.fetch_all(query=query, values=values)
     
     d = []
@@ -151,8 +156,9 @@ async def check_brute_force():
     return attackers
 
 async def check_traffic_spike():
-    events = select_events_before(dminutes=1, event_type="*")
+    events = await select_events_before(dminutes=1)
     count = len(events)
+    
     if count > 100:
         return count
     else:
