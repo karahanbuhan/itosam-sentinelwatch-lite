@@ -5,6 +5,37 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 <img width="1279" height="695" alt="Screenshot 2026-07-09 163127" src="https://github.com/user-attachments/assets/7726284c-b753-476f-a47a-13dd08a2b634" />
 <img width="1279" height="694" alt="Screenshot 2026-07-09 163116" src="https://github.com/user-attachments/assets/3b3449c5-7bb7-452f-97d4-ef967fd6f746" />
 
+## Kurulum & Çalıştırma
+SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Önceki gerekli kütüphane ve framework'lerin yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
+
+### Kurulum & Çalıştırma
+#### Backend
+1. Projeyi bilgisayarınıza klonlayın ve klonladığınız projenin içine girin.
+```bash
+git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
+cd itosam-sentinelwatch-lite
+```
+2. Bir venv ortamı oluşturun.
+```bash
+python -m venv .
+```
+3. **(Windows için)** venv ortamını aktif edin.
+```bash
+.\Scripts\activate.bat
+```
+3. **(MacOS & Linux için)** venv ortamını aktif edin.
+```bash
+.\Scripts\activate
+```
+4. Gerekli Python kütüphanelerini yükleyin.
+```bash
+pip install -r ./requirements.txt
+```
+5. Backend (geliştirme) sunucusunu FastAPI ile başlatın.
+```bash
+fastapi dev .\src\main.py
+```
+
 ## Uç Noktaların JSON Formatları
 ### /api/events:
 ```JSON
