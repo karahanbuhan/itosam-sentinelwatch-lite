@@ -1,9 +1,5 @@
-import json
 from datetime import datetime, timezone, timedelta
-import string
-import ipaddress
 import random
-import sys
 import csv
 
 
@@ -92,7 +88,7 @@ async def insert_mock_event():
         source_ip = generate_random_ipv4()
     else:
         source_ip = users[username]
-
+    event_type = "HIGH_CPU"
     query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
         {
@@ -102,6 +98,7 @@ async def insert_mock_event():
             "username": username
         }
     ]
+    
     await database.execute_many(query=query, values=values)
 
 app.add_middleware(
@@ -119,13 +116,17 @@ async def api_events():
     results = await database.fetch_all(query=query)
     return results
 
-async def select_events_before(dminutes, event_type):
+async def select_events_before(dminutes, event_type=None):
     dtime = datetime.now(timezone.utc).replace(microsecond=0)
     dtime = dtime - timedelta(minutes=dminutes)
     dtime = dtime.isoformat()
     
-    query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
-    values = { "event_type": event_type, "dtime": dtime }
+    query = "SELECT * FROM events WHERE (timestamp > :dtime);"
+    values = { "dtime": dtime }
+    if event_type != None:
+        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"        
+        values = { "event_type": event_type, "dtime": dtime }
+    
     results = await database.fetch_all(query=query, values=values)
     
     d = []
@@ -150,6 +151,24 @@ async def check_brute_force():
         
     return attackers
 
+async def check_traffic_spike():
+    events = await select_events_before(dminutes=1)
+    count = len(events)
+    
+    if count > 100:
+        return count
+    else:
+        return 0
+    
+async def check_high_cpu():
+    events = await select_events_before(dminutes=2, event_type="HIGH_CPU")
+    count = len(events)
+    
+    if count > 3:
+        return count
+    else:
+        return 0
+
 @app.get("/api/alerts")
 async def api_alerts():
     results = []    
@@ -159,7 +178,26 @@ async def api_alerts():
             "type": "BRUTE_FORCE",
             "severity": "HIGH",
             "source_ip": attacker,
+            "event_count": attackers[attacker],
             "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
         })
-                
+        
+    event_count = await check_traffic_spike()
+    if event_count != 0:
+        results.append({
+            "type": "TRAFFIC_SPIKE",
+            "severity": "MEDIUM",
+            "event_count": event_count,
+            "description": f"Son 1 dakika içerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
+        })
+        
+    event_count = await check_high_cpu()
+    if event_count != 0:
+        results.append({
+            "type": "HIGH_CPU",
+            "severity": "LOW",
+            "event_count": event_count,
+            "description": f"Son 2 dakika içerisinde {event_count} adet yüksek CPU kullanimi olayi olustu"
+        })    
+    
     return results
