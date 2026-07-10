@@ -8,34 +8,6 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 ## Kurulum & Çalıştırma
 SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Önceki gerekli kütüphane ve framework'lerin yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
 
-### Kurulum & Çalıştırma
-#### Backend
-1. Projeyi bilgisayarınıza klonlayın ve klonladığınız projenin içine girin.
-```bash
-git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
-cd itosam-sentinelwatch-lite
-```
-2. Bir venv ortamı oluşturun.
-```bash
-python -m venv .
-```
-3. **(Windows için)** venv ortamını aktif edin.
-```bash
-.\Scripts\activate.bat
-```
-3. **(MacOS & Linux için)** venv ortamını aktif edin.
-```bash
-.\Scripts\activate
-```
-4. Gerekli Python kütüphanelerini yükleyin.
-```bash
-pip install -r ./requirements.txt
-```
-5. Backend (geliştirme) sunucusunu FastAPI ile başlatın.
-```bash
-fastapi dev .\src\main.py
-```
-
 ## Uç Noktaların JSON Formatları
 ### /api/events:
 ```JSON
@@ -87,3 +59,31 @@ fastapi dev .\src\main.py
 - SQLite3
 - React (Vite)
 - Tailwind CSS
+
+### Kurulum & Çalıştırma
+#### Backend
+1. Projeyi bilgisayarınıza klonlayın ve klonladığınız projenin içine girin.
+```bash
+git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
+cd itosam-sentinelwatch-lite
+```
+2. Bir venv ortamı oluşturun.
+```bash
+python -m venv .
+```
+3. **(Windows için)** venv ortamını aktif edin.
+```bash
+.\Scripts\activate.bat
+```
+3. **(MacOS & Linux için)** venv ortamını aktif edin.
+```bash
+.\Scripts\activate
+```
+4. Gerekli Python kütüphanelerini yükleyin.
+```bash
+pip install -r ./requirements.txt
+```
+5. Backend (geliştirme) sunucusunu FastAPI ile başlatın.
+```bash
+fastapi dev .\src\main.py
+```
