@@ -74,7 +74,7 @@ async def insert_mock_event():
         generate_user() # Generate new user, seldomly
     elif rand < 0.27:
         users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
-    elif 0.45 > rand > 0.54:
+    elif 0.45 > rand and rand < 0.54:
         return # Sometimes skip so it is not perfectly linear
     
     
