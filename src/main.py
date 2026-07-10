@@ -92,7 +92,7 @@ async def insert_mock_event():
         source_ip = generate_random_ipv4()
     else:
         source_ip = users[username]
-
+    event_type = "HIGH_CPU"
     query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
         {
@@ -163,6 +163,15 @@ async def check_traffic_spike():
         return count
     else:
         return 0
+    
+async def check_high_cpu():
+    events = await select_events_before(dminutes=2, event_type="HIGH_CPU")
+    count = len(events)
+    
+    if count > 3:
+        return count
+    else:
+        return 0
 
 @app.get("/api/alerts")
 async def api_alerts():
@@ -173,6 +182,7 @@ async def api_alerts():
             "type": "BRUTE_FORCE",
             "severity": "HIGH",
             "source_ip": attacker,
+            "event_count": attackers[attacker],
             "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
         })
         
@@ -184,5 +194,14 @@ async def api_alerts():
             "event_count": event_count,
             "description": f"Son 1 dakika içerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
         })
+        
+    event_count = await check_high_cpu()
+    if event_count != 0:
+        results.append({
+            "type": "HIGH_CPU",
+            "severity": "LOW",
+            "event_count": event_count,
+            "description": f"Son 2 dakika içerisinde {event_count} adet yüksek CPU kullanimi olayi olustu"
+        })    
     
     return results
