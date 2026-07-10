@@ -58,7 +58,7 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 ```
 
 ## Kurulum & Çalıştırma
-SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Öncelikle gerekli kütüphane ve framework'ler yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
+SentinelWatch Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Öncelikle gerekli kütüphane ve framework'ler yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
 ### Backend
 0. Bilgisayarınıza gerekli yazılımları yükleyin.
 Backend sunucusunu ayağa kaldırabilmek için bilgisayarınızda **git** ve **Python** yazılımlarının yüklü olması gerekmektedir. Proje geliştirilirken *git v2.53.0* ve *Python 3.14.3* kullanılmıştır ve minimum bu sürümlerin kullanılması tavsiye edilir.
