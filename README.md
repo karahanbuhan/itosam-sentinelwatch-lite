@@ -91,3 +91,15 @@ pip install -r ./requirements.txt
 0. Bilgisayarınıza gerekli yazılımları yükleyin.
 Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi ve sunucunun çalıştırılabilmesi için **npm* kullanılmaktadır. Proje geliştirilirken *npm 11.16.0* kullanılmıştır ve minimum bu sürümün kullanılması tavsiye edilir.
 - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
+1. Frontend klasörünün içine girin.
+```bash
+cd ./frontend
+```
+2. Proje için gerekli paketleri yükleyin.
+```bash
+npm install
+```
+3. Sunucuyu başlatın.
+```bash
+npm run dev
+```
