@@ -188,7 +188,7 @@ async def api_alerts():
             "type": "TRAFFIC_SPIKE",
             "severity": "MEDIUM",
             "event_count": event_count,
-            "description": f"Son 1 dakika içerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
+            "description": f"Son 1 dakika icerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
         })
         
     event_count = await check_high_cpu()
@@ -197,7 +197,7 @@ async def api_alerts():
             "type": "HIGH_CPU",
             "severity": "LOW",
             "event_count": event_count,
-            "description": f"Son 2 dakika içerisinde {event_count} adet yüksek CPU kullanimi olayi olustu"
+            "description": f"Son 2 dakika icerisinde {event_count} adet yuksek CPU kullanimi olayi olustu"
         })    
     
     return results

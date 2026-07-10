@@ -53,3 +53,10 @@ databases==0.9.0
 pure_eval==0.2.3
 traitlets==5.15.1
 wcwidth==0.8.2
+charset-normalizer==3.4.9
+kagglesdk==0.1.33
+packaging==26.2
+protobuf==7.35.1
+requests==2.34.2
+SQLAlchemy-Utils==0.42.1
+tqdm==4.68.4
