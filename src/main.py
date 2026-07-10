@@ -92,7 +92,7 @@ async def insert_mock_event():
         source_ip = generate_random_ipv4()
     else:
         source_ip = users[username]
-    event_type = "HIGH_CPU"
+
     query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
     values = [
         {
