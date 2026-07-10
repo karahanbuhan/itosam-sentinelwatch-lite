@@ -64,6 +64,9 @@ SentinelWatch Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan
 Backend sunucusunu ayağa kaldırabilmek için bilgisayarınızda **git** ve **Python** yazılımlarının yüklü olması gerekmektedir. Proje geliştirilirken *git v2.53.0* ve *Python 3.14.3* kullanılmıştır ve minimum bu sürümlerin kullanılması tavsiye edilir.
 - https://git-scm.com/install/
 - https://www.python.org/downloads/
+
+*Bir terminal/konsol açıp aşağıdaki komutları yazmadan önce gerekli yazılımları yüklediğinize emin olun. Terminal açıkken yükleme yaparsanız, terminal yeniden başlatılana kadar gerekli komutlar çevre değişkenlerinden okunmayacağı için komut bulunamadı hatasıyla karşılaşabilirsiniz.*
+
 1. Projeyi bilgisayarınıza klonlayın ve klonladığınız projenin içine girin.
 ```bash
 git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
