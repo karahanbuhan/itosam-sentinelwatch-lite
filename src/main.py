@@ -150,6 +150,14 @@ async def check_brute_force():
         
     return attackers
 
+async def check_traffic_spike():
+    events = select_events_before(dminutes=1, event_type="*")
+    count = len(events)
+    if count > 100:
+        return count
+    else:
+        return 0
+
 @app.get("/api/alerts")
 async def api_alerts():
     results = []    
@@ -161,5 +169,14 @@ async def api_alerts():
             "source_ip": attacker,
             "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
         })
-                
+        
+    event_count = await check_traffic_spike()
+    if event_count != 0:
+        results.append({
+            "type": "TRAFFIC_SPIKE",
+            "severity": "MEDIUM",
+            "event_count": event_count,
+            "description": f"Son 1 dakika içerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
+        })
+    
     return results
