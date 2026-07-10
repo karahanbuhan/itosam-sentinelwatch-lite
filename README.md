@@ -88,8 +88,6 @@ python -m venv .
 pip install -r ./requirements.txt
 ```
 #### Frontend
-1. 
-5. Backend (geliştirme) sunucusunu FastAPI ile başlatın.
-```bash
-fastapi dev .\src\main.py
-```
+0. Bilgisayarınıza gerekli yazılımları yükleyin.
+Frontend sunucusunda React (Vite) kullanılmaktadır ve kurulumun yapılabilmesi ve sunucunun çalıştırılabilmesi için **npm* kullanılmaktadır. Proje geliştirilirken *npm 11.16.0* kullanılmıştır ve minimum bu sürümün kullanılması tavsiye edilir.
+- https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
