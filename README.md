@@ -62,12 +62,16 @@ SentinelWatch-Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan
 
 ### Kurulum & Çalıştırma
 #### Backend
+0. Bilgisayarınıza gerekli yazılımları yükleyin.
+Backend sunucusunu ayağa kaldırabilmek için bilgisayarınızda **git** ve **Python** yazılımlarının yüklü olması gerekmektedir. Proje geliştirilirken *git v2.53.0* ve *Python 3.14.3* kullanılmıştır ve minimum bu sürümlerin kullanılması tavsiye edilir.
+- https://git-scm.com/install/
+- https://www.python.org/downloads/
 1. Projeyi bilgisayarınıza klonlayın ve klonladığınız projenin içine girin.
 ```bash
 git clone https://github.com/karahanbuhan/itosam-sentinelwatch-lite.git
 cd itosam-sentinelwatch-lite
 ```
-2. Bir venv ortamı oluşturun.
+2. Bir venv ortamı oluşturun. (Bazı kurulumlarda komut kullanırken python yerine python3 yazmanız gerekebilir.)
 ```bash
 python -m venv .
 ```
@@ -83,6 +87,8 @@ python -m venv .
 ```bash
 pip install -r ./requirements.txt
 ```
+#### Frontend
+1. 
 5. Backend (geliştirme) sunucusunu FastAPI ile başlatın.
 ```bash
 fastapi dev .\src\main.py
