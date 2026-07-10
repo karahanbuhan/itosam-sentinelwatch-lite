@@ -66,6 +66,26 @@ def generate_user():
 for i in range(0, 10):
     generate_user()
 
+async def play_brute_force():
+    username = random.choice(list(users.keys()))
+    source_ip = users[username]
+    event_type = "LOGIN_FAILED"
+    
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0)    
+    timestamp = timestamp.isoformat()
+    query = "INSERT INTO events (timestamp, source_ip, event_type, username) VALUES(:timestamp, :source_ip, :event_type, :username);"
+    values = [
+        {
+            "timestamp": timestamp,
+            "source_ip": source_ip,
+            "event_type": event_type,
+            "username": username
+        }
+    ]
+    
+    for i in range(random.randint(5, 8)):
+        await database.execute_many(query=query, values=values)
+
 @app.on_event("startup")
 @repeat_every(seconds=2)
 async def insert_mock_event():    
@@ -74,10 +94,13 @@ async def insert_mock_event():
         generate_user() # Generate new user, seldomly
     elif rand < 0.27:
         users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
-    elif 0.45 > rand and rand < 0.54:
+    elif rand > 0.45 and rand < 0.48:
         return # Sometimes skip so it is not perfectly linear
     
-    
+    ### DEMO SCRIPT ###
+    if rand > 0.80 and rand < 0.87:
+        await play_brute_force()
+    ### DEMO SCRIPT ###
     
     # Microsecond part is not required in the PDR, hide
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
