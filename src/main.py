@@ -217,7 +217,7 @@ async def api_alerts():
             "severity": "HIGH",
             "source_ip": attacker,
             "event_count": attackers[attacker],
-            "desription": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
+            "description": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
         })
         
     event_count = await check_traffic_spike()
