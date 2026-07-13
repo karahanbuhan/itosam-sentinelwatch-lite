@@ -2,8 +2,8 @@
 SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik olarak izleyen, basit ama gerçek kurallara göre şüpheli davranışları (ör. brute-force giriş denemesi, anormal istek yoğunluğu) tespit eden ve bunları düzenli aralıklarla güncellenen bir dashboard üzerinde gösteren bir izleme panelidir.
 
 ## Ekran Görüntüleri
-<img width="1279" height="695" alt="Screenshot 2026-07-09 163127" src="https://github.com/user-attachments/assets/7726284c-b753-476f-a47a-13dd08a2b634" />
-<img width="1279" height="694" alt="Screenshot 2026-07-09 163116" src="https://github.com/user-attachments/assets/3b3449c5-7bb7-452f-97d4-ef967fd6f746" />
+<img width="1267" height="692" alt="Screenshot 2026-07-13 171317" src="https://github.com/user-attachments/assets/c9f22c1a-2525-4065-9b33-1aa215be8b8e" />
+<img width="1270" height="690" alt="Screenshot 2026-07-13 171337" src="https://github.com/user-attachments/assets/5b21aabc-27d3-469b-8b0e-ecf9a0a74b7e" />
 
 ## Kullanılan Teknolojiler
 - FastAPI (Python)
