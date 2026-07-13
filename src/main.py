@@ -86,23 +86,8 @@ async def play_brute_force():
     for i in range(random.randint(5, 8)):
         await database.execute_many(query=query, values=values)
 
-@app.on_event("startup")
-@repeat_every(seconds=2)
-async def insert_mock_event():    
-    rand = random.random()    
-    if rand > 0.93:
-        generate_user() # Generate new user, seldomly
-    elif rand < 0.27:
-        users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
-    elif rand > 0.45 and rand < 0.48:
-        return # Sometimes skip so it is not perfectly linear
-    
-    ### DEMO SCRIPT ###
-    if rand > 0.80 and rand < 0.87:
-        await play_brute_force()
-    ### DEMO SCRIPT ###
-    
-    # Microsecond part is not required in the PDR, hide
+async def add_user():
+     # Microsecond part is not required in the PDR, hide
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     
     event_type = random.choice(
@@ -127,6 +112,32 @@ async def insert_mock_event():
     ]
     
     await database.execute_many(query=query, values=values)
+
+async def play_dos_attack():
+    for i in range(100, 300):
+        await add_user()
+
+@app.on_event("startup")
+@repeat_every(seconds=2)
+async def insert_mock_event():
+    rand = random.random()    
+    if rand > 0.93:
+        generate_user() # Generate new user, seldomly
+    elif rand < 0.27:
+        users.pop(random.choice(users.keys())) # Delete random user moderately so new clients come and go
+    elif rand > 0.45 and rand < 0.48:
+        return # Sometimes skip so it is not perfectly linear
+    
+    ### DEMO SCRIPT ###
+    if rand > 0.80 and rand < 0.87:
+        await play_brute_force()
+        return
+    elif rand > 0.73 and rand < 0.76:
+        await play_dos_attack()
+        return
+    ### DEMO SCRIPT ###
+
+    await add_user()
 
 app.add_middleware(
     CORSMiddleware,
