@@ -3,7 +3,7 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 
 ## Ekran Görüntüleri
 <img width="1267" height="692" alt="Screenshot 2026-07-13 171317" src="https://github.com/user-attachments/assets/c9f22c1a-2525-4065-9b33-1aa215be8b8e" />
-<img width="1270" height="690" alt="Screenshot 2026-07-13 171337" src="https://github.com/user-attachments/assets/5b21aabc-27d3-469b-8b0e-ecf9a0a74b7e" />
+<img width="1267" height="695" alt="Screenshot 2026-07-13 171409" src="https://github.com/user-attachments/assets/d98da461-2a15-4d04-8669-f93e1d83cf85" />
 
 ## Kullanılan Teknolojiler
 - FastAPI (Python)
