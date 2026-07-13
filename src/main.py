@@ -149,9 +149,20 @@ app.add_middleware(
 
 
 @app.get("/api/events")
-async def api_events():
-    query = "SELECT * FROM events"
-    results = await database.fetch_all(query=query)
+async def api_events(before: int = -1):
+    if before == -1:
+        query = "SELECT * FROM events"
+        results = await database.fetch_all(query=query)
+    else:
+        dtime = datetime.now(timezone.utc).replace(microsecond=0)
+        dtime = dtime - timedelta(seconds=before)
+        dtime = dtime.isoformat()
+    
+        query = "SELECT * FROM events WHERE (timestamp > :dtime);" 
+        values = { "dtime": dtime }
+        
+        results = await database.fetch_all(query=query, values=values)
+    
     return results
 
 async def select_events_before(dminutes, event_type=None):
