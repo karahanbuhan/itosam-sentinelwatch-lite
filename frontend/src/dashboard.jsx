@@ -7,12 +7,11 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('ALL');
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Koyu tema sınıfını tetikleme
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
 
-  // 5 Saniyede Bir Gerçek Veri Akışı (Polling)
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,7 +30,7 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // Filtreleme ve Sıralama
+
   const filteredEvents = events.filter(event => {
     if (filter === 'ALL') return true;
     const type = event.event_type || event.eventType || event.type;
@@ -39,14 +38,14 @@ export default function Dashboard() {
   });
   const sortedEvents = [...filteredEvents].reverse();
 
-  // Alarm Renk ve Derece Eşleştirmesi (Temiz Yönetim)
   const alertStyles = {
     HIGH: { box: "bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900/60", icon: "bg-red-100 dark:bg-red-950/40 text-red-600", title: "text-red-800 dark:text-red-400", badge: "bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-400 dark:border-red-900", text: "Yüksek Seviye" },
     MEDIUM: { box: "bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/60", icon: "bg-orange-100 dark:bg-orange-950/40 text-orange-600", title: "text-orange-800 dark:text-orange-400", badge: "bg-orange-100 text-orange-800 dark:bg-orange-950/50 dark:text-orange-400 dark:border-orange-900", text: "Orta Seviye" },
     LOW: { box: "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/60", icon: "bg-amber-100 dark:bg-amber-950/40 text-amber-600", title: "text-amber-800 dark:text-amber-400", badge: "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-400 dark:border-orange-900", text: "Düşük Seviye" }
   };
 
-  // Log Rozeti Renk Eşleştirmesi
+
+  
   const getBadgeStyle = (type) => {
     const styles = {
       LOGIN_FAILED: isDarkMode ? "text-red-400 bg-red-500/10 border-red-500/20" : "text-red-700 bg-red-50 border-red-100",
@@ -60,12 +59,9 @@ export default function Dashboard() {
     return styles[type] || (isDarkMode ? "text-slate-300 bg-slate-800 border-slate-700" : "text-slate-500 bg-slate-50 border-slate-200/60");
   };
 
-  const currentAlert = alerts[0];
-  const activeStyle = currentAlert ? (alertStyles[currentAlert.severity] || alertStyles.LOW) : null;
-
   return (
     <div className="dashboard-container dark:bg-slate-950">
-      {/* Üst Panel Başlığı */}
+
       <header className="main-header">
         <div>
           <div className="flex items-center gap-2">
@@ -104,30 +100,36 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* Dinamik Alarm Paneli */}
-      {currentAlert && activeStyle && (
-        <div className={`alarm-box mb-6 ${activeStyle.box}`}>
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg font-bold ${activeStyle.icon}`}>⚠️</div>
-            <div>
-              <span className={`font-bold text-xs uppercase tracking-wide ${activeStyle.title}`}>
-                Risk Tespit Edildi: {currentAlert.type}
-              </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {currentAlert.description}
-              </p>
-            </div>
-          </div>
-          <span className={`alarm-badge ${activeStyle.badge}`}>
-            {activeStyle.text}
-          </span>
+      {alerts.length > 0 && (
+        <div className="flex flex-col gap-3 mb-6">
+          {alerts.map((alert, index) => {
+            const activeStyle = alertStyles[alert.severity] || alertStyles.LOW;
+            return (
+              <div className={`alarm-box ${activeStyle.box}`} key={alert.id || index}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg font-bold ${activeStyle.icon}`}>⚠️</div>
+                  <div>
+                    <span className={`font-bold text-xs uppercase tracking-wide ${activeStyle.title}`}>
+                      Risk Tespit Edildi: {alert.type}
+                    </span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      {alert.description}
+                    </p>
+                  </div>
+                </div>
+                <span className={`alarm-badge ${activeStyle.badge}`}>
+                  {activeStyle.text}
+                </span>
+              </div>
+            );
+          })}
         </div>
       )}
 
-      {/* Panel Izgarası */}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Grafik Kartı */}
+
         <div className="lg:col-span-2 chart-card dark:bg-slate-900 dark:border-slate-800">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Olay Trafik Dağılımı</h2>
@@ -138,7 +140,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Canlı Log Akışı Kartı */}
+    
         <div className="log-card dark:bg-slate-900 dark:border-slate-800">
           <div className="border-b border-slate-100 dark:border-slate-800 pb-3 mb-3 flex justify-between items-center">
             <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Canlı Olay Akışı</h2>
