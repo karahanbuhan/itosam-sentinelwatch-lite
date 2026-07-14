@@ -48,9 +48,9 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 Bu uç noktayı kullanırken iki opsiyonel parametre mevcuttur:
 | Kullanım örneği  | Yaptığı iş |
 | ------------- | ------------- |
-| api/events?before=300  | Son 5 dakika içerisinde oluşan olayları getirir  |
-| api/events?type=LOGIN_FAILED  | Sadece başarısız giriş olaylarını getirir  |
-| api/events?before=600&type=HIGH_CPU  | Son 10 dakikadaki yüksek CPU kullanım olaylarını getirir  |
+| /api/events?before=300  | Son 5 dakika içerisinde oluşan olayları getirir  |
+| /api/events?type=LOGIN_FAILED  | Sadece başarısız giriş olaylarını getirir  |
+| /api/events?before=600&type=HIGH_CPU  | Son 10 dakikadaki yüksek CPU kullanım olaylarını getirir  |
 
 ### /api/alerts:
 ```JSON
