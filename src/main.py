@@ -2,7 +2,6 @@ from datetime import datetime, timezone, timedelta
 import random
 import csv
 
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -165,9 +164,9 @@ async def api_events(before: int = -1):
     
     return results
 
-async def select_events_before(dminutes, event_type=None):
+async def select_events_before(seconds=300, event_type=None):
     dtime = datetime.now(timezone.utc).replace(microsecond=0)
-    dtime = dtime - timedelta(minutes=dminutes)
+    dtime = dtime - timedelta(seconds=seconds)
     dtime = dtime.isoformat()
     
     query = "SELECT * FROM events WHERE (timestamp > :dtime);"
@@ -184,7 +183,7 @@ async def select_events_before(dminutes, event_type=None):
     return d
 
 async def check_brute_force():
-    events = await select_events_before(dminutes=25, event_type="LOGIN_FAILED")
+    events = await select_events_before(seconds=1500, event_type="LOGIN_FAILED")
     
     results = []
     ip_counter = {}
@@ -207,7 +206,7 @@ async def check_brute_force():
     return results
 
 async def check_traffic_spike():
-    events = await select_events_before(dminutes=1)
+    events = await select_events_before(seconds=60)
     count = len(events)
     
     if count > 100:
@@ -216,7 +215,7 @@ async def check_traffic_spike():
         return 0
     
 async def check_high_cpu():
-    events = await select_events_before(dminutes=2, event_type="HIGH_CPU")
+    events = await select_events_before(seconds=120, event_type="HIGH_CPU")
     count = len(events)
     
     if count > 3:
