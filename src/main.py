@@ -149,7 +149,9 @@ app.add_middleware(
 
 @app.get("/api/events")
 async def api_events(before: int = -1, type=None):
-    return await select_events_before(seconds=before, event_type=type.upper())
+    if type is not None:
+        type = type.upper()
+    return await select_events_before(seconds=before, event_type=type)
 
 async def select_events_before(seconds=-1, event_type=None):    
     if seconds < 0:
