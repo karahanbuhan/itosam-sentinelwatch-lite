@@ -174,6 +174,13 @@ async def select_events_before(seconds=-1, event_type=None):
         d.append(dict(zip(result.keys(), result.values())))    
     return d
 
+@app.get("/api/demo/{name}")
+async def demo(name: str):
+    if name == "brute-force":
+        await play_brute_force()
+        return "success"
+    return "fail"
+
 async def check_brute_force():
     events = await select_events_before(seconds=1500, event_type="LOGIN_FAILED")
     
