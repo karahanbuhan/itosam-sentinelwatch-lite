@@ -2,7 +2,6 @@ from datetime import datetime, timezone, timedelta
 import random
 import csv
 
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -149,31 +148,21 @@ app.add_middleware(
 
 
 @app.get("/api/events")
-async def api_events(before: int = -1):
-    if before == -1:
-        query = "SELECT * FROM events"
-        results = await database.fetch_all(query=query)
+async def api_events(before: int = -1, type=None):
+    return await select_events_before(seconds=before, event_type=type.upper())
+
+async def select_events_before(seconds=-1, event_type=None):    
+    if seconds < 0:
+        dtime = datetime.fromtimestamp(0, timezone.utc)
     else:
         dtime = datetime.now(timezone.utc).replace(microsecond=0)
-        dtime = dtime - timedelta(seconds=before)
-        dtime = dtime.isoformat()
-    
-        query = "SELECT * FROM events WHERE (timestamp > :dtime);" 
-        values = { "dtime": dtime }
-        
-        results = await database.fetch_all(query=query, values=values)
-    
-    return results
-
-async def select_events_before(dminutes, event_type=None):
-    dtime = datetime.now(timezone.utc).replace(microsecond=0)
-    dtime = dtime - timedelta(minutes=dminutes)
+        dtime = dtime - timedelta(seconds=seconds)    
     dtime = dtime.isoformat()
     
     query = "SELECT * FROM events WHERE (timestamp > :dtime);"
     values = { "dtime": dtime }
     if event_type != None:
-        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"        
+        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
         values = { "event_type": event_type, "dtime": dtime }
     
     results = await database.fetch_all(query=query, values=values)
@@ -184,7 +173,7 @@ async def select_events_before(dminutes, event_type=None):
     return d
 
 async def check_brute_force():
-    events = await select_events_before(dminutes=25, event_type="LOGIN_FAILED")
+    events = await select_events_before(seconds=1500, event_type="LOGIN_FAILED")
     
     results = []
     ip_counter = {}
@@ -207,7 +196,7 @@ async def check_brute_force():
     return results
 
 async def check_traffic_spike():
-    events = await select_events_before(dminutes=1)
+    events = await select_events_before(seconds=60)
     count = len(events)
     
     if count > 100:
@@ -216,7 +205,7 @@ async def check_traffic_spike():
         return 0
     
 async def check_high_cpu():
-    events = await select_events_before(dminutes=2, event_type="HIGH_CPU")
+    events = await select_events_before(seconds=120, event_type="HIGH_CPU")
     count = len(events)
     
     if count > 3:
