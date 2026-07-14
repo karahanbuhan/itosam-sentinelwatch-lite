@@ -129,7 +129,7 @@ async def insert_mock_event():
         return # Sometimes skip so it is not perfectly linear
     
     ### DEMO SCRIPT ###
-    if rand > 0.80 and rand < 0.87:
+    if rand > 0.80 and rand < 0.85:
         await play_brute_force()
         return
     elif rand > 0.73 and rand < 0.76:
@@ -186,7 +186,7 @@ async def select_events_before(dminutes, event_type=None):
 async def check_brute_force():
     events = await select_events_before(dminutes=25, event_type="LOGIN_FAILED")
     
-    attackers = {}
+    results = []
     ip_counter = {}
     for event in events:
         if event["source_ip"] not in ip_counter:
@@ -196,9 +196,15 @@ async def check_brute_force():
     for ip in ip_counter:
         count = ip_counter[ip]
         if count > 5:
-            attackers[event["source_ip"]] = count
-        
-    return attackers
+            results.append({            
+                "type": "BRUTE_FORCE",
+                "severity": "HIGH",
+                "source_ip": ip,
+                "event_count": count,
+                "description": f"{ip} adresinden 5 dakikada {count} basarisiz giris"
+            })
+            
+    return results
 
 async def check_traffic_spike():
     events = await select_events_before(dminutes=1)
@@ -221,15 +227,9 @@ async def check_high_cpu():
 @app.get("/api/alerts")
 async def api_alerts():
     results = []    
-    attackers = await check_brute_force()
-    for attacker in attackers:
-        results.append({
-            "type": "BRUTE_FORCE",
-            "severity": "HIGH",
-            "source_ip": attacker,
-            "event_count": attackers[attacker],
-            "description": f"{attacker} adresinden 5 dakikada {attackers[attacker]} basarisiz giris"
-        })
+    
+    for attack in await check_brute_force():
+        results.append(attack)
         
     event_count = await check_traffic_spike()
     if event_count != 0:
