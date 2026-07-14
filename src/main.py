@@ -148,31 +148,21 @@ app.add_middleware(
 
 
 @app.get("/api/events")
-async def api_events(before: int = -1):
-    if before == -1:
-        query = "SELECT * FROM events"
-        results = await database.fetch_all(query=query)
+async def api_events(before: int = -1, type=None):
+    return await select_events_before(seconds=before, event_type=type.upper())
+
+async def select_events_before(seconds=-1, event_type=None):    
+    if seconds < 0:
+        dtime = datetime.fromtimestamp(0, timezone.utc)
     else:
         dtime = datetime.now(timezone.utc).replace(microsecond=0)
-        dtime = dtime - timedelta(seconds=before)
-        dtime = dtime.isoformat()
-    
-        query = "SELECT * FROM events WHERE (timestamp > :dtime);" 
-        values = { "dtime": dtime }
-        
-        results = await database.fetch_all(query=query, values=values)
-    
-    return results
-
-async def select_events_before(seconds=300, event_type=None):
-    dtime = datetime.now(timezone.utc).replace(microsecond=0)
-    dtime = dtime - timedelta(seconds=seconds)
+        dtime = dtime - timedelta(seconds=seconds)    
     dtime = dtime.isoformat()
     
     query = "SELECT * FROM events WHERE (timestamp > :dtime);"
     values = { "dtime": dtime }
     if event_type != None:
-        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"        
+        query = "SELECT * FROM events WHERE (event_type = :event_type and timestamp > :dtime);"
         values = { "event_type": event_type, "dtime": dtime }
     
     results = await database.fetch_all(query=query, values=values)
