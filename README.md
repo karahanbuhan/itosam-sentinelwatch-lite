@@ -68,6 +68,8 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
   }
 ]
 ```
+### /api/demo/{dos | brute-force}:
+DoS saldırısı ve Brute Force saldırılarını manuel olarak simüle etmeyi sağlar.
 
 ## Kurulum & Çalıştırma
 SentinelWatch Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Öncelikle gerekli kütüphane ve framework'ler yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
