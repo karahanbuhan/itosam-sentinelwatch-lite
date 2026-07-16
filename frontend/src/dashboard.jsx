@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import EventChart from './EventChart.jsx';
 
 export default function Dashboard() {
+  const [allEvents, setAllEvents] = useState([]);
+  var allEventsPulled = false;
+
   const [events, setEvents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [filter, setFilter] = useState('ALL');
@@ -11,11 +14,24 @@ export default function Dashboard() {
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
 
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const eventsResponse = await fetch('/api/events?before=86400');
+        if (eventsResponse.ok) setAllEvents(await eventsResponse.json());
+      } catch (error) {
+          console.error("Veri akış hatası:", error);
+      }
+    }
+      
+    setTimeout(fetchAllData, 1000);
+    allEventsPulled = true;
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsResponse = await fetch('/api/events');
+        const eventsResponse = await fetch('/api/events?before=300');
         if (eventsResponse.ok) setEvents(await eventsResponse.json());
 
         const alertsResponse = await fetch('/api/alerts');
@@ -25,13 +41,14 @@ export default function Dashboard() {
       }
     };
 
-    fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  var combinedEvents = allEvents.concat(events);
 
-  const filteredEvents = events.filter(event => {
+  
+  const filteredEvents = allEvents.filter(event => {
     if (filter === 'ALL') return true;
     const type = event.event_type || event.eventType || event.type;
     return type === filter;
@@ -136,7 +153,7 @@ export default function Dashboard() {
             <p className="text-[11px] text-slate-400 mt-0.5">Sisteme düşen anlık logların zaman bazlı yoğunluğu</p>
           </div>
           <div className="chart-wrapper dark:bg-slate-950 dark:border-slate-800/60">
-            <EventChart events={events} isDarkMode={isDarkMode} />
+            <EventChart events={combinedEvents} isDarkMode={isDarkMode} />
           </div>
         </div>
 

@@ -3,7 +3,6 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 
 
 export default function EventChart({ events = [], isDarkMode = false }) {
-  
   const processData = () => {
     if (!events || events.length === 0) {
       return [
@@ -23,6 +22,7 @@ export default function EventChart({ events = [], isDarkMode = false }) {
         } else {
           const date = new Date(event.timestamp);
           if (!isNaN(date.getTime())) {
+            date.setMinutes(Math.ceil(date.getMinutes() / 5) * 5);
             minuteStr = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
           }
         }
