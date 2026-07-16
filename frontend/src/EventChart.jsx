@@ -2,7 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 
-export default function EventChart({ events = [], isDarkMode = false }) {
+export default function EventChart({ events = [], newEvents = [], isDarkMode = false }) {
   const processData = () => {
     if (!events || events.length === 0) {
       return [

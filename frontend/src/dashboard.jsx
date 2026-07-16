@@ -153,7 +153,7 @@ export default function Dashboard() {
             <p className="text-[11px] text-slate-400 mt-0.5">Sisteme düşen anlık logların zaman bazlı yoğunluğu</p>
           </div>
           <div className="chart-wrapper dark:bg-slate-950 dark:border-slate-800/60">
-            <EventChart events={combinedEvents} isDarkMode={isDarkMode} />
+            <EventChart events={combinedEvents} newEvents={events} isDarkMode={isDarkMode} />
           </div>
         </div>
 
