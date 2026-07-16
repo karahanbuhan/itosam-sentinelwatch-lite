@@ -128,7 +128,7 @@ async def insert_mock_event():
         return # Sometimes skip so it is not perfectly linear
     
     ### DEMO SCRIPT ###
-    if rand > 0.80 and rand < 0.85:
+    if rand > 0.80 and rand < 0.83:
         await play_brute_force()
         return
     elif rand > 0.73 and rand < 0.76:
@@ -177,10 +177,17 @@ async def select_events_before(seconds=-1, event_type=None):
 # TODO: Add timestamps to success links
 @app.get("/api/demo/{name}")
 async def demo(name: str):
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    success = False
+    
     if name == "brute-force":
         await play_brute_force()
-        return { "success": True }
-    return { "success": False }
+        success = True
+    elif name == "dos":
+        await play_dos_attack()
+        success = True
+        
+    return { "success": success, "timestamp": timestamp}
 
 async def check_brute_force():
     events = await select_events_before(seconds=1500, event_type="LOGIN_FAILED")
