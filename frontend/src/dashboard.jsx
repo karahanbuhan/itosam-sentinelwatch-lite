@@ -45,8 +45,12 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  var combinedEvents = allEvents.concat(events);
 
+  var combinedEvents = allEvents.concat(events).filter((x, i, self) => self.findIndex(y => y.id === x.id) === i);;
+  console.log("events: ", events.length);
+  console.log("all events:", allEvents.length);
+  console.log("combined events:", combinedEvents.length);
+  
   const filteredEvents = allEvents.filter(event => {
     if (filter === 'ALL') return true;
     const type = event.event_type || event.eventType || event.type;
