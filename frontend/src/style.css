@@ -10,9 +10,9 @@
   @apply bg-[#0f172a] text-slate-100;
 }
 
-/* Üst Başlık Alanı */
+/* Üst Başlık Alanı - Dikeyde Ortalandı ve Yan Yana Hizalandı */
 .main-header {
-  @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200/80 pb-5 mb-6;
+  @apply flex flex-row justify-between items-center gap-4 border-b border-slate-200/80 pb-5 mb-6;
 }
 .dark .main-header {
   @apply border-slate-800;
@@ -26,13 +26,31 @@
   @apply bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-0;
 }
 
-/* Yapısal Alarm Kutusu Özellikleri (Renkler JS'den Yönetiliyor) */
+/* Çok sayıda alarm gelirse sayfayı uzatmasın diye sınırlı yükseklikte, kendi içinde kayan liste */
+.alarm-list-wrapper {
+  @apply max-h-[22rem] overflow-y-auto pr-1;
+}
+.alarm-list-wrapper::-webkit-scrollbar {
+  width: 5px;
+}
+.alarm-list-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+.alarm-list-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.dark .alarm-list-wrapper::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+/* Zarif, Kısa ve Kompakt Alarm Kutusu Tasarımı */
 .alarm-box {
-  @apply mb-6 border rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm backdrop-blur-md;
+  @apply border rounded-xl px-4 py-2.5 flex justify-between items-center gap-3 shadow-sm backdrop-blur-md mr-119;
 }
 
 .alarm-badge {
-  @apply text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border;
+  @apply text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border;
 }
 
 /* Sade ve Premium Kart Yapısı */
