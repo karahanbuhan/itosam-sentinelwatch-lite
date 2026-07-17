@@ -7,6 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 from databases import Database
 
+demo = True
+
 # Store usernames for generating mock data
 usernames = []
 with open("./resources/datasets/github_users.csv", newline="", encoding="utf-8") as csvfile:
@@ -113,7 +115,7 @@ async def add_user():
     await database.execute_many(query=query, values=values)
 
 async def play_dos_attack():
-    for i in range(100, 300):
+    for i in range(100, 200):
         await add_user()
 
 @app.on_event("startup")
@@ -128,12 +130,13 @@ async def insert_mock_event():
         return # Sometimes skip so it is not perfectly linear
     
     ### DEMO SCRIPT ###
-    if rand > 0.80 and rand < 0.85:
-        await play_brute_force()
-        return
-    elif rand > 0.73 and rand < 0.76:
-        await play_dos_attack()
-        return
+    if demo:
+        if rand > 0.80 and rand < 0.82:
+            await play_brute_force()
+            return
+        elif rand > 0.73 and rand < 0.75:
+            await play_dos_attack()
+            return
     ### DEMO SCRIPT ###
 
     await add_user()
@@ -177,10 +180,18 @@ async def select_events_before(seconds=-1, event_type=None):
 # TODO: Add timestamps to success links
 @app.get("/api/demo/{name}")
 async def demo(name: str):
-    if name == "brute-force":
-        await play_brute_force()
-        return { "success": True }
-    return { "success": False }
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    success = False
+    
+    if demo:
+        if name == "brute-force":
+            await play_brute_force()
+            success = True
+        elif name == "dos":
+            await play_dos_attack()
+            success = True
+        
+    return { "success": success, "timestamp": timestamp}
 
 async def check_brute_force():
     events = await select_events_before(seconds=1500, event_type="LOGIN_FAILED")
