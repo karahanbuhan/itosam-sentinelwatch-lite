@@ -115,7 +115,7 @@ async def add_user():
     await database.execute_many(query=query, values=values)
 
 async def play_dos_attack():
-    for i in range(100, 300):
+    for i in range(100, 200):
         await add_user()
 
 @app.on_event("startup")
@@ -131,10 +131,10 @@ async def insert_mock_event():
     
     ### DEMO SCRIPT ###
     if demo:
-        if rand > 0.80 and rand < 0.83:
+        if rand > 0.80 and rand < 0.82:
             await play_brute_force()
             return
-        elif rand > 0.73 and rand < 0.76:
+        elif rand > 0.73 and rand < 0.75:
             await play_dos_attack()
             return
     ### DEMO SCRIPT ###
