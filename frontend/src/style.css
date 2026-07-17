@@ -46,7 +46,7 @@
 
 /* Zarif, Kısa ve Kompakt Alarm Kutusu Tasarımı */
 .alarm-box {
-  @apply border rounded-xl px-4 py-2.5 flex justify-between items-center gap-3 shadow-sm backdrop-blur-md mr-119;
+  @apply border rounded-xl px-4 py-2.5 flex justify-between items-center gap-3 shadow-sm backdrop-blur-md;
 }
 
 .alarm-badge {
