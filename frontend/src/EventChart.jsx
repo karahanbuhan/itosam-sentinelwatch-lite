@@ -2,7 +2,22 @@ import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 
-export default function EventChart({ events = [], newEvents = [], isDarkMode = false }) {
+export default function EventChart({ events = [], newEvents = [], isDarkMode = false, highlightedTimestamps = [] }) {
+
+  // Olayın hangi 5 dakikalık kovaya girdiğini belirleyen ortak fonksiyon.
+  // Hem grafik verisini oluştururken hem de vurgulanacak noktaları bulurken
+  // AYNI mantığı kullanıyoruz ki kova anahtarları birebir eşleşsin.
+  const getBucketKey = (timestamp) => {
+    if (!timestamp) return '00:00';
+    if (typeof timestamp === 'string' && !timestamp.includes('-') && !timestamp.includes('T')) {
+      return timestamp.substring(0, 5);
+    }
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return '00:00';
+    date.setMinutes(Math.ceil(date.getMinutes() / 5) * 5);
+    return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  };
+
   const processData = () => {
     if (!events || events.length === 0) {
       return [
@@ -15,18 +30,7 @@ export default function EventChart({ events = [], newEvents = [], isDarkMode = f
     const countsByMinute = {};
 
     events.forEach(event => {
-      let minuteStr = '00:00';
-      if (event.timestamp) {
-        if (typeof event.timestamp === 'string' && !event.timestamp.includes('-') && !event.timestamp.includes('T')) {
-          minuteStr = event.timestamp.substring(0, 5);
-        } else {
-          const date = new Date(event.timestamp);
-          if (!isNaN(date.getTime())) {
-            date.setMinutes(Math.ceil(date.getMinutes() / 5) * 5);
-            minuteStr = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-          }
-        }
-      }
+      const minuteStr = getBucketKey(event.timestamp);
       countsByMinute[minuteStr] = (countsByMinute[minuteStr] || 0) + 1;
     });
 
@@ -40,12 +44,24 @@ export default function EventChart({ events = [], newEvents = [], isDarkMode = f
 
   const chartData = processData();
 
+  // Seçili alarm veya tıklanan olayla ilişkili kovaları belirliyoruz.
+  const highlightedMinutes = new Set(highlightedTimestamps.map(getBucketKey));
+
 
   const strokeColor = isDarkMode ? '#38bdf8' : '#2563eb';  
   const gridColor = isDarkMode ? '#334155' : '#f1f5f9';     
   const tooltipBg = isDarkMode ? '#1e293b' : '#ffffff';    
   const tooltipBorder = isDarkMode ? '#334155' : '#e2e8f0'; 
   const textColor = isDarkMode ? '#94a3b8' : '#64748b';     
+
+  // Vurgulanan kovalar için normalden büyük, kırmızı bir nokta çiziyoruz.
+  const renderDot = (props) => {
+    const { cx, cy, payload } = props;
+    if (highlightedMinutes.has(payload.time)) {
+      return <circle key={`dot-${payload.time}`} cx={cx} cy={cy} r={7} fill="#ef4444" stroke="#ffffff" strokeWidth={2} />;
+    }
+    return <circle key={`dot-${payload.time}`} cx={cx} cy={cy} r={4} fill={isDarkMode ? '#0f172a' : '#ffffff'} stroke={strokeColor} strokeWidth={2} />;
+  };
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
@@ -70,7 +86,7 @@ export default function EventChart({ events = [], newEvents = [], isDarkMode = f
             dataKey="Olay Sayısı" 
             stroke={strokeColor} 
             strokeWidth={2.5}
-            dot={{ fill: isDarkMode ? '#0f172a' : '#ffffff', stroke: strokeColor, strokeWidth: 2, r: 4 }}
+            dot={renderDot}
             activeDot={{ r: 6, fill: strokeColor }} 
           />
         </LineChart>
