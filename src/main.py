@@ -278,3 +278,23 @@ async def api_alerts():
         })    
     
     return results
+
+@app.get("/api/rules")
+async def api_rules():
+    return "returns all rules"
+
+@app.post("/api/rules")
+async def api_rules():
+    return "creates new rule, requires parameters"
+
+@app.patch("/api/rules/{id}")
+async def api_rules(id: str):
+    return "enables disables the rule"
+
+@app.get("api/alerts/history")
+async def api_alerts_history():
+    return "Filters and lists the alerts"
+
+@app.patch("api/alerts/{id}/resolve")
+async def api_alerts_resolve():
+    return "Sets an alert as resolved"
