@@ -196,7 +196,6 @@ async def select_events_before(seconds=-1, event_type=None):
         d.append(dict(zip(result.keys(), result.values())))    
     return d
 
-# TODO: Add timestamps to success links
 @app.get("/api/demo/{name}")
 async def demo(name: str):
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
