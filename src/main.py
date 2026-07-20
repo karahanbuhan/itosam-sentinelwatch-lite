@@ -38,14 +38,33 @@ async def database_connect():
     await database.connect()
 
     # Create events table if it does not exist
-    query = """CREATE TABLE IF NOT EXISTS events (
+    create_events = """CREATE TABLE IF NOT EXISTS events (
                     id INTEGER PRIMARY KEY,
                     timestamp TEXT NOT NULL,
                     source_ip TEXT NOT NULL,
                     event_type TEXT NOT NULL,
                     username TEXT
                 );"""
-    await database.execute(query)
+    create_rules = """CREATE TABLE IF NOT EXISTS rules (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    event_type TEXT NOT NULL,
+                    threshold_count INTEGER NOT NULL,
+                    time_window_seconds INTEGER NOT NULL,
+                    severity TEXT NOT NULL,
+                    is_active INTEGER NOT NULL
+                );"""
+    create_alerts = """CREATE TABLE IF NOT EXISTS alerts (
+                    id INTEGER PRIMARY KEY,
+                    rule_id INTEGER NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    source_ip TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    is_resolved INTEGER NOT NULL
+                );"""
+    await database.execute(create_events)
+    await database.execute(create_rules)
+    await database.execute(create_alerts)
 
 
 @app.on_event("shutdown")
