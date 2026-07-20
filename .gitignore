@@ -172,3 +172,6 @@ database.db
 *.njsproj
 *.sln
 *.sw?
+
+database.sqlite3
+*.sqlite3

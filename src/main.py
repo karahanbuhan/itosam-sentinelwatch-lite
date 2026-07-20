@@ -1,8 +1,11 @@
 from datetime import datetime, timezone, timedelta
 import random
 import csv
+import os
+
 import aiofiles
 
+from glob import glob
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -23,7 +26,7 @@ with open("./resources/datasets/github_users.csv", newline="", encoding="utf-8")
         usernames.append(username)
 
 # Database setup
-database = Database("sqlite:///database.sqlite")
+database = Database("sqlite:///database.sqlite3")
 
 # Fast API setup
 app = FastAPI()
@@ -33,42 +36,12 @@ origins = [
     "http://localhost:8000",
 ]
 
+import os
 
 @app.on_event("startup")
 async def database_connect():
     await database.connect()
-
     
-    # Create events table if it does not exist
-#    create_events = """CREATE TABLE IF NOT EXISTS events (
-                    #id INTEGER PRIMARY KEY,
-                    #timestamp TEXT NOT NULL,
-                    #source_ip TEXT NOT NULL,
-                    #event_type TEXT NOT NULL,
-                    #username TEXT
-                #);"""
-    #create_rules = """CREATE TABLE IF NOT EXISTS rules (
-                    #id INTEGER PRIMARY KEY,
-                    #name TEXT NOT NULL,
-                    #event_type TEXT NOT NULL,
-                    #threshold_count INTEGER NOT NULL,
-                    #time_window_seconds INTEGER NOT NULL,
-                    #severity TEXT NOT NULL,
-                    #is_active INTEGER NOT NULL
-                #);"""
-    #create_alerts = """CREATE TABLE IF NOT EXISTS alerts (
-                    #id INTEGER PRIMARY KEY,
-                    #rule_id INTEGER NOT NULL,
-                    #timestamp TEXT NOT NULL,
-                    #source_ip TEXT NOT NULL,
-                    #description TEXT NOT NULL,
-                    #is_resolved INTEGER NOT NULL
-                #);"""
-    #await database.execute(create_events)
-    #await database.execute(create_rules)
-    #await database.execute(create_alerts)
-
-
 @app.on_event("shutdown")
 async def database_disconnect():
     await database.disconnect()    
