@@ -1,7 +1,11 @@
 from datetime import datetime, timezone, timedelta
 import random
 import csv
+import os
 
+import aiofiles
+
+from glob import glob
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
@@ -22,7 +26,7 @@ with open("./resources/datasets/github_users.csv", newline="", encoding="utf-8")
         usernames.append(username)
 
 # Database setup
-database = Database("sqlite:///database.db")
+database = Database("sqlite:///database.sqlite3")
 
 # Fast API setup
 app = FastAPI()
@@ -32,22 +36,12 @@ origins = [
     "http://localhost:8000",
 ]
 
+import os
 
 @app.on_event("startup")
 async def database_connect():
     await database.connect()
-
-    # Create events table if it does not exist
-    query = """CREATE TABLE IF NOT EXISTS events (
-                    id INTEGER PRIMARY KEY,
-                    timestamp TEXT NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    event_type TEXT NOT NULL,
-                    username TEXT
-                );"""
-    await database.execute(query)
-
-
+    
 @app.on_event("shutdown")
 async def database_disconnect():
     await database.disconnect()    
@@ -177,7 +171,6 @@ async def select_events_before(seconds=-1, event_type=None):
         d.append(dict(zip(result.keys(), result.values())))    
     return d
 
-# TODO: Add timestamps to success links
 @app.get("/api/demo/{name}")
 async def demo(name: str):
     timestamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -260,3 +253,23 @@ async def api_alerts():
         })    
     
     return results
+
+@app.get("/api/rules")
+async def api_rules():
+    return "returns all rules"
+
+@app.post("/api/rules")
+async def api_rules():
+    return "creates new rule, requires parameters"
+
+@app.patch("/api/rules/{id}")
+async def api_rules(id: str):
+    return "enables disables the rule"
+
+@app.get("api/alerts/history")
+async def api_alerts_history():
+    return "Filters and lists the alerts"
+
+@app.patch("api/alerts/{id}/resolve")
+async def api_alerts_resolve():
+    return "Sets an alert as resolved"

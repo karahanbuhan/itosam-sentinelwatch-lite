@@ -7,7 +7,7 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 
 ## Kullanılan Teknolojiler
 - FastAPI (Python)
-- SQLite3
+- SQLite3 (Alembic)
 - React (Vite)
 - Tailwind CSS
 
@@ -105,7 +105,11 @@ python -m venv .
 ```bash
 python -m pip install -r ./requirements.txt
 ```
-5. Sunucuyu FastAPI ile başlatın.
+5. Alembic ile gerekli veritabanı migrasyonlarını çalıştırın.
+```bash
+alembic upgrade head
+```
+6. Sunucuyu FastAPI ile başlatın.
 ```bash
 python -m fastapi dev ./src/main.py
 ```
