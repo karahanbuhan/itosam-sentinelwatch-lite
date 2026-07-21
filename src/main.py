@@ -282,15 +282,16 @@ async def check_alerts_by_rules():
                        ip_events_dict[event["source_ip"]].append(event)
                 
                 for ip in ip_events_dict:
-                    alerts.append({
-                        "ruleName": rule["name"],
-                        "timestamp": timestamp.isoformat(),
-                        "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
-                        "event_count": len(ip_events_dict[ip]),
-                        "source_ip": ip,
-                        "severity": rule["severity"],
-                        "isResolved": False
-                    })
+                    if len(ip_events_dict[ip]) >= rule["threshold_count"]:
+                        alerts.append({
+                            "ruleName": rule["name"],
+                            "timestamp": timestamp.isoformat(),
+                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
+                            "event_count": len(ip_events_dict[ip]),
+                            "source_ip": ip,
+                            "severity": rule["severity"],
+                            "isResolved": False
+                        })
             
             # TODO: Veritabanına uyarıları yerleştir
             
