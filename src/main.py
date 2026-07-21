@@ -213,11 +213,9 @@ async def check_alerts_by_rules():
     query = "SELECT * FROM rules;"    
     rules = await database.fetch_all(query=query)
     
-    biggest_threshold = 0
+    # Kurallardan en yüksek zaman aralığı değeri olanın değeri kadar geçmişten olay alınacak ve sadece bir defa yapılacak
     biggest_time_window_seconds = 0
     for rule in rules:
-        if rule["threshold_count"] > biggest_threshold:
-            biggest_threshold = rule["threshold_count"]
         if rule["time_window_seconds"] > biggest_time_window_seconds:
             biggest_time_window_seconds = rule["time_window_seconds"]
     events = await select_events_before(seconds=biggest_time_window_seconds)    
@@ -226,10 +224,9 @@ async def check_alerts_by_rules():
     events_by_types = {}
     
     for rule in rules:
+        events_by_types[rule["event_type"].lower()] = []
         for event in events:
-            if rule["event_type"].lower() == event["event_type"].lower() or rule["event_type"] == "*":
-                
-                
+            if rule["event_type"].lower() == event["event_type"].lower() or rule["event_type"] == "*":                                            
                 event_timestamp = datetime.fromisoformat(event["timestamp"])
                 timestamp = datetime.now(timezone.utc).replace(microsecond=0)
                 
@@ -237,16 +234,18 @@ async def check_alerts_by_rules():
                 
                 if rule["time_window_seconds"] < dtime.seconds:
                     continue
+                
+                events_by_types[rule["event_type"].lower()].append(event)
+                
                 if rule["name"] not in rule_hit_counter:
                     rule_hit_counter[rule["name"]] = 0
                 else:
                     rule_hit_counter[rule["name"]] += 1
         
-        print(rule_hit_counter, rule["threshold_count"], rule_hit_counter[rule["name"]])
-        
+        alerts = []
         if rule_hit_counter[rule["name"]] >= rule["threshold_count"]:
-            print("ALARM! ", rule["name"], await select_events_before(seconds=rule["time_window_seconds"], event_type=rule["event_type"]))
-                
+            print("ALARM!!!!!! ", rule["name"], events_by_types[rule["event_type"].lower()])
+            alerts.append()
                 
 
 async def check_traffic_spike():
