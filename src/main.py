@@ -261,19 +261,9 @@ async def check_alerts_by_rules():
                 events_for_rule = events_by_types 
             else:                
                 events_for_rule = events_by_types[rule["event_type"].lower()]
-                
-            alerts.append({
-                    "ruleName": rule["name"],
-                    "timestamp": timestamp.isoformat(),
-                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
-                    "event_count": rule_hit_counter[rule["name"]],
-                    "severity": rule["severity"],
-                    "isResolved": False
-            })
             
-            # TODO: is_same_ip_check olanları ayır
+            # Özel bu flag'e sahip olan olaylar her ip adresi için ayrı ayrı uyarı oluşturmaya çalışır.
             if rule["is_same_ip_check"] == 1:
-                #print("SAME IP CHECK: ", events_for_rule)
                 ip_events_dict = {}
                 for event in events_for_rule:
                     if event["source_ip"] not in ip_events_dict:
@@ -292,7 +282,15 @@ async def check_alerts_by_rules():
                             "severity": rule["severity"],
                             "isResolved": False
                         })
-            
+            else:
+                alerts.append({
+                    "ruleName": rule["name"],
+                    "timestamp": timestamp.isoformat(),
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
+                    "event_count": rule_hit_counter[rule["name"]],
+                    "severity": rule["severity"],
+                    "isResolved": False
+                })
             # TODO: Veritabanına uyarıları yerleştir
             
     
