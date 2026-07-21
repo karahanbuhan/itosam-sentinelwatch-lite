@@ -228,6 +228,10 @@ async def check_alerts_by_rules():
     events_by_types = {}
     
     for rule in rules:
+        # Sadece aktif kurallar ile çalışılacak
+        if rule["is_active"] == 0:            
+            continue
+        
         events_by_types[rule["event_type"].lower()] = []
         for event in events:
             if rule["event_type"].lower() == event["event_type"].lower() or rule["event_type"] == "*":                                            
@@ -256,6 +260,8 @@ async def check_alerts_by_rules():
                 events_for_rule = events_by_types[rule["event_type"].lower()]
                 
             print("ALARM!!!!!! ", rule["name"], events_for_rule)
+            
+            # TODO: is_same_ip_check olanları ayır
             
             # TODO: Veritabanına uyarıları yerleştir
                 
