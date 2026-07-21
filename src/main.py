@@ -216,6 +216,7 @@ async def check_brute_force():
 async def check_alerts_by_rules():
     query = "SELECT * FROM rules;"    
     rules = await database.fetch_all(query=query)
+    alerts = []
     
     # Kurallardan en yüksek zaman aralığı değeri olanın değeri kadar geçmişten olay alınacak ve sadece bir defa yapılacak
     biggest_time_window_seconds = 0
@@ -261,7 +262,14 @@ async def check_alerts_by_rules():
             else:                
                 events_for_rule = events_by_types[rule["event_type"].lower()]
                 
-            print("ALARM!!!!!! ", rule["name"], events_for_rule)
+            alerts.append({
+                    "ruleName": rule["name"],
+                    "timestamp": timestamp.isoformat(),
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {len(events_for_rule)} adet olay oldu",
+                    "event_count": len(events_for_rule),
+                    "severity": rule["severity"],
+                    "isResolved": False
+            })
             
             # TODO: is_same_ip_check olanları ayır
             if rule["is_same_ip_check"] == 1:
@@ -273,13 +281,20 @@ async def check_alerts_by_rules():
                     else:
                        ip_events_dict[event["source_ip"]].append(event)
                 
-                print("\n\n\n\n")   
-                print(ip_events_dict)
+                    alerts.append({
+                        "ruleName": rule["name"],
+                        "timestamp": timestamp.isoformat(),
+                        "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[event["source_ip"]])} adet olay oldu",
+                        "event_count": len(ip_events_dict[event["source_ip"]]),
+                        "source_ip": event["source_ip"],
+                        "severity": rule["severity"],
+                        "isResolved": False
+                    })
             
             # TODO: Veritabanına uyarıları yerleştir
             
-            # TODO: Ekrana uyarıları göster
-                
+    
+    return alerts
 
 async def check_traffic_spike():
     events = await select_events_before(seconds=60)
@@ -301,8 +316,8 @@ async def check_high_cpu():
 
 @app.get("/api/alerts")
 async def api_alerts():
-    await check_alerts_by_rules()
-    return
+    return await check_alerts_by_rules()
+    
 
 
     results = []    
