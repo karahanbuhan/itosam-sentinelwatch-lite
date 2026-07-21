@@ -10,6 +10,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 from databases import Database
+from itertools import groupby
+import operator
 
 demo = True
 
@@ -262,8 +264,21 @@ async def check_alerts_by_rules():
             print("ALARM!!!!!! ", rule["name"], events_for_rule)
             
             # TODO: is_same_ip_check olanları ayır
+            if rule["is_same_ip_check"] == 1:
+                #print("SAME IP CHECK: ", events_for_rule)
+                ip_events_dict = {}
+                for event in events_for_rule:
+                    if event["source_ip"] not in ip_events_dict:
+                        ip_events_dict[event["source_ip"]] = [event]
+                    else:
+                       ip_events_dict[event["source_ip"]].append(event)
+                
+                print("\n\n\n\n")   
+                print(ip_events_dict)
             
             # TODO: Veritabanına uyarıları yerleştir
+            
+            # TODO: Ekrana uyarıları göster
                 
 
 async def check_traffic_spike():
