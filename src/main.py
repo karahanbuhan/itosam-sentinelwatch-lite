@@ -209,6 +209,8 @@ async def check_brute_force():
             
     return results
 
+
+
 async def check_alerts_by_rules():
     query = "SELECT * FROM rules;"    
     rules = await database.fetch_all(query=query)
@@ -220,7 +222,9 @@ async def check_alerts_by_rules():
             biggest_time_window_seconds = rule["time_window_seconds"]
     events = await select_events_before(seconds=biggest_time_window_seconds)    
     
+    # Bir kuralın kaç defa tetiklendiğini daha sonra istenilen threshold'da mı diye kontrol etmek için
     rule_hit_counter = {}
+    # Olayları daha sonra türlerine göre ayırmak istersek
     events_by_types = {}
     
     for rule in rules:
@@ -242,10 +246,18 @@ async def check_alerts_by_rules():
                 else:
                     rule_hit_counter[rule["name"]] += 1
         
-        alerts = []
-        if rule_hit_counter[rule["name"]] >= rule["threshold_count"]:
-            print("ALARM!!!!!! ", rule["name"], events_by_types[rule["event_type"].lower()])
-            alerts.append()
+        if rule["name"] not in rule_hit_counter:
+            continue
+        elif rule_hit_counter[rule["name"]] >= rule["threshold_count"]:
+            if rule["event_type"] == "*":
+                # Eğer kuralda wildcard kullanıldıysa tüm olaylar döndürülecek
+                events_for_rule = events_by_types 
+            else:                
+                events_for_rule = events_by_types[rule["event_type"].lower()]
+                
+            print("ALARM!!!!!! ", rule["name"], events_for_rule)
+            
+            # TODO: Veritabanına uyarıları yerleştir
                 
 
 async def check_traffic_spike():
