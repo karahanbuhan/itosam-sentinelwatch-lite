@@ -265,8 +265,8 @@ async def check_alerts_by_rules():
             alerts.append({
                     "ruleName": rule["name"],
                     "timestamp": timestamp.isoformat(),
-                    "description": f"Son {rule["time_window_seconds"]} saniyede {len(events_for_rule)} adet olay oldu",
-                    "event_count": len(events_for_rule),
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
+                    "event_count": rule_hit_counter[rule["name"]],
                     "severity": rule["severity"],
                     "isResolved": False
             })
