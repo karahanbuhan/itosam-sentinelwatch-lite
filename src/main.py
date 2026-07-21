@@ -209,6 +209,46 @@ async def check_brute_force():
             
     return results
 
+async def check_alerts_by_rules():
+    query = "SELECT * FROM rules;"    
+    rules = await database.fetch_all(query=query)
+    
+    biggest_threshold = 0
+    biggest_time_window_seconds = 0
+    for rule in rules:
+        if rule["threshold_count"] > biggest_threshold:
+            biggest_threshold = rule["threshold_count"]
+        if rule["time_window_seconds"] > biggest_time_window_seconds:
+            biggest_time_window_seconds = rule["time_window_seconds"]
+    events = await select_events_before(seconds=biggest_time_window_seconds)    
+    
+    rule_hit_counter = {}
+    events_by_types = {}
+    
+    for rule in rules:
+        for event in events:
+            if rule["event_type"].lower() == event["event_type"].lower() or rule["event_type"] == "*":
+                
+                
+                event_timestamp = datetime.fromisoformat(event["timestamp"])
+                timestamp = datetime.now(timezone.utc).replace(microsecond=0)
+                
+                dtime = timestamp - event_timestamp
+                
+                if rule["time_window_seconds"] < dtime.seconds:
+                    continue
+                if rule["name"] not in rule_hit_counter:
+                    rule_hit_counter[rule["name"]] = 0
+                else:
+                    rule_hit_counter[rule["name"]] += 1
+        
+        print(rule_hit_counter, rule["threshold_count"], rule_hit_counter[rule["name"]])
+        
+        if rule_hit_counter[rule["name"]] >= rule["threshold_count"]:
+            print("ALARM! ", rule["name"], await select_events_before(seconds=rule["time_window_seconds"], event_type=rule["event_type"]))
+                
+                
+
 async def check_traffic_spike():
     events = await select_events_before(seconds=60)
     count = len(events)
@@ -229,6 +269,10 @@ async def check_high_cpu():
 
 @app.get("/api/alerts")
 async def api_alerts():
+    await check_alerts_by_rules()
+    return
+
+
     results = []    
     
     for attack in await check_brute_force():
