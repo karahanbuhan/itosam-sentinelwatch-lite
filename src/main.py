@@ -10,6 +10,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utils.tasks import repeat_every
 from databases import Database
+from itertools import groupby
+import operator
 
 demo = True
 
@@ -209,6 +211,91 @@ async def check_brute_force():
             
     return results
 
+
+
+async def check_alerts_by_rules():
+    query = "SELECT * FROM rules;"    
+    rules = await database.fetch_all(query=query)
+    alerts = []
+    
+    # Kurallardan en yüksek zaman aralığı değeri olanın değeri kadar geçmişten olay alınacak ve sadece bir defa yapılacak
+    biggest_time_window_seconds = 0
+    for rule in rules:
+        if rule["time_window_seconds"] > biggest_time_window_seconds:
+            biggest_time_window_seconds = rule["time_window_seconds"]
+    events = await select_events_before(seconds=biggest_time_window_seconds)    
+    
+    # Bir kuralın kaç defa tetiklendiğini daha sonra istenilen threshold'da mı diye kontrol etmek için
+    rule_hit_counter = {}
+    # Olayları daha sonra türlerine göre ayırmak istersek
+    events_by_types = {}
+    
+    for rule in rules:
+        # Sadece aktif kurallar ile çalışılacak
+        if rule["is_active"] == 0:            
+            continue
+        
+        events_by_types[rule["event_type"].lower()] = []
+        for event in events:
+            if rule["event_type"].lower() == event["event_type"].lower() or rule["event_type"] == "*":                                            
+                event_timestamp = datetime.fromisoformat(event["timestamp"])
+                timestamp = datetime.now(timezone.utc).replace(microsecond=0)
+                
+                dtime = timestamp - event_timestamp
+                
+                if rule["time_window_seconds"] < dtime.seconds:
+                    continue
+                
+                events_by_types[rule["event_type"].lower()].append(event)
+                
+                if rule["name"] not in rule_hit_counter:
+                    rule_hit_counter[rule["name"]] = 0
+                else:
+                    rule_hit_counter[rule["name"]] += 1
+        
+        if rule["name"] not in rule_hit_counter:
+            continue
+        elif rule_hit_counter[rule["name"]] >= rule["threshold_count"]:
+            if rule["event_type"] == "*":
+                # Eğer kuralda wildcard kullanıldıysa tüm olaylar döndürülecek
+                events_for_rule = events_by_types 
+            else:                
+                events_for_rule = events_by_types[rule["event_type"].lower()]
+            
+            # Özel bu flag'e sahip olan olaylar her ip adresi için ayrı ayrı uyarı oluşturmaya çalışır.
+            if rule["is_same_ip_check"] == 1:
+                ip_events_dict = {}
+                for event in events_for_rule:
+                    if event["source_ip"] not in ip_events_dict:
+                        ip_events_dict[event["source_ip"]] = [event]
+                    else:
+                       ip_events_dict[event["source_ip"]].append(event)
+                
+                for ip in ip_events_dict:
+                    if len(ip_events_dict[ip]) >= rule["threshold_count"]:
+                        alerts.append({
+                            "ruleName": rule["name"],
+                            "timestamp": timestamp.isoformat(),
+                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
+                            "event_count": len(ip_events_dict[ip]),
+                            "source_ip": ip,
+                            "severity": rule["severity"],
+                            "isResolved": False
+                        })
+            else:
+                alerts.append({
+                    "ruleName": rule["name"],
+                    "timestamp": timestamp.isoformat(),
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
+                    "event_count": rule_hit_counter[rule["name"]],
+                    "severity": rule["severity"],
+                    "isResolved": False
+                })
+            # TODO: Veritabanına uyarıları yerleştir
+            
+    
+    return alerts
+
 async def check_traffic_spike():
     events = await select_events_before(seconds=60)
     count = len(events)
@@ -229,6 +316,10 @@ async def check_high_cpu():
 
 @app.get("/api/alerts")
 async def api_alerts():
+    return await check_alerts_by_rules()
+    
+
+
     results = []    
     
     for attack in await check_brute_force():

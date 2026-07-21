@@ -26,9 +26,16 @@ def upgrade() -> None:
         sa.Column("name", sa.String, nullable=False),
         sa.Column("event_type", sa.String, nullable=False),
         sa.Column("threshold_count", sa.Integer, nullable= False),
+        sa.Column("time_window_seconds", sa.Integer, nullable=False),
         sa.Column("severity", sa.String, nullable=False),
-        sa.Column("is_active", sa.Integer, nullable=False)
+        sa.Column("is_same_ip_check", sa.Integer, default=0),
+        sa.Column("is_active", sa.Integer, nullable=False, default=0)
     )
+    
+    """Some data migration for default rules"""
+    op.execute("INSERT INTO rules (name, event_type, threshold_count, time_window_seconds, severity, is_same_ip_check, is_active) VALUES ('Brute Force Girişi', 'LOGIN_FAILED', 5, 300, 'HIGH', 1, 1)")
+    op.execute("INSERT INTO rules (name, event_type, threshold_count, time_window_seconds, severity, is_same_ip_check, is_active) VALUES ('Trafik Artışı', '*', 100, 60, 'MEDIUM', 0, 1)")
+    op.execute("INSERT INTO rules (name, event_type, threshold_count, time_window_seconds, severity, is_same_ip_check, is_active) VALUES ('Yüksek CPU Kullanımı', 'HIGH_CPU', 3, 120, 'LOW', 0, 1)")
 
 
 def downgrade() -> None:
