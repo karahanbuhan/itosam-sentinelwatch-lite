@@ -357,6 +357,13 @@ async def api_alerts_history():
     query = "SELECT * FROM alerts;"    
     return await database.fetch_all(query=query)
 
-@app.patch("api/alerts/{id}/resolve")
-async def api_alerts_resolve():
-    return "Sets an alert as resolved"
+@app.patch("/api/alerts/{id}/resolve")
+async def api_alerts_resolve(id: str):    
+    query = "UPDATE alerts SET is_resolved = 1 WHERE (id = :id)"
+    values = {"id": id}    
+    await database.execute(query=query, values=values)
+    
+    timestamp = datetime.now(timezone.utc).replace(microsecond=0)    
+    timestamp = timestamp.isoformat()
+    
+    return {timestamp: timestamp, "success": True}
