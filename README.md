@@ -12,7 +12,7 @@ SentinelWatch Lite, bir sisteme ait olay kayıtlarını (log/event) periyodik ol
 - Tailwind CSS
 
 ## Uç Noktalar
-### /api/events:
+### /api/events (GET): 
 ```JSON
 [
   {
@@ -52,31 +52,111 @@ Bu uç noktayı kullanırken iki opsiyonel parametre mevcuttur:
 | /api/events?type=LOGIN_FAILED  | Sadece başarısız giriş olaylarını getirir  |
 | /api/events?before=600&type=HIGH_CPU  | Son 10 dakikadaki yüksek CPU kullanım olaylarını getirir  |
 
-### /api/alerts:
+### /api/alerts (GET):
+```JSON
+[
+  ...
+  {
+    "rule_id": 2,
+    "rule_name": "Trafik Artışı",
+    "timestamp": "2026-07-24T07:14:43+00:00",
+    "description": "Son 60 saniyede 105 adet Trafik Artışı kuralı tetiklendi",
+    "event_count": 105,
+    "event_type": "*",
+    "username": null,
+    "severity": "MEDIUM",
+    "is_resolved": false
+  },
+  {
+    "rule_id": 3,
+    "rule_name": "Yüksek CPU Kullanımı",
+    "timestamp": "2026-07-24T07:14:43+00:00",
+    "description": "Son 120 saniyede 13 adet Yüksek CPU Kullanımı kuralı tetiklendi",
+    "event_count": 13,
+    "event_type": "HIGH_CPU",
+    "username": null,
+    "severity": "LOW",
+    "is_resolved": false
+  }
+  ...
+]
+```
+
+### /api/alerts/history (GET):
+Tüm oluşmuş uyarıları liste halinde döndürür, örnek şu şekilde gözükmektedir:
+```JSON
+[
+...
+  {
+    "id": 28,
+    "rule_id": 1,
+    "timestamp": "2026-07-24T06:32:01+00:00",
+    "source_ip": "162.42.25.119",
+    "description": "Son 300 saniyede 7 adet Brute Force Girişi kuralı tetiklendi",
+    "is_resolved": 0
+  },
+  {
+    "id": 29,
+    "rule_id": 2,
+    "timestamp": "2026-07-24T06:32:01+00:00",
+    "source_ip": null,
+    "description": "Son 60 saniyede 118 adet Trafik Artışı kuralı tetiklendi",
+    "is_resolved": 0
+  },
+  {
+    "id": 30,
+    "rule_id": 3,
+    "timestamp": "2026-07-24T06:32:01+00:00",
+    "source_ip": null,
+    "description": "Son 120 saniyede 35 adet Yüksek CPU Kullanımı kuralı tetiklendi",
+    "is_resolved": 0
+  }
+...
+]
+```
+
+### /api/alerts/{id}/resolve (PATCH):
+İstenilen uyarının is_resolved alanını 1 yapar, çözülmüş ve okunmuş uyarılar içindir.
+
+### /api/demo/{dos | brute-force} (GET):
+DoS saldırısı ve Brute Force saldırılarını manuel olarak simüle etmeyi sağlar. **Bu uç noktanın çalışabilmesi için programdaki demo değişkeninin True değerinde olması gerekmektedir.**
+
+### /api/rules (GET):
+Mevcut tüm kuralları döndürür. Uyarılar bu kurallar ile oluşur, varsayılan kurallar şekilde gözükmektedir:
 ```JSON
 [
   {
-    "type": "BRUTE_FORCE",
+    "id": 1,
+    "name": "Brute Force Girişi",
+    "event_type": "LOGIN_FAILED",
+    "threshold_count": 5,
+    "time_window_seconds": 300,
     "severity": "HIGH",
-    "source_ip": "132.50.137.216",
-    "description": "132.50.137.216 adresinden 5 dakikada 8 basarisiz giris"
+    "is_same_ip_check": 1,
+    "is_active": 1
   },
   {
-    "type": "TRAFFIC_SPIKE",
+    "id": 2,
+    "name": "Trafik Artışı",
+    "event_type": "*",
+    "threshold_count": 100,
+    "time_window_seconds": 60,
     "severity": "MEDIUM",
-    "event_count": 104,
-    "description": "Son 1 dakika içerisinde 104 adet olay oldu, trafik limiti 100 asildi"
+    "is_same_ip_check": 0,
+    "is_active": 1
   },
-  {  
-    "type": "HIGH_CPU",
+  {
+    "id": 3,
+    "name": "Yüksek CPU Kullanımı",
+    "event_type": "HIGH_CPU",
+    "threshold_count": 3,
+    "time_window_seconds": 120,
     "severity": "LOW",
-    "event_count": 17,
-    "description": "Son 2 dakika içerisinde 17 adet yüksek CPU kullanimi olayi olustu"
+    "is_same_ip_check": 0,
+    "is_active": 1
   }
 ]
 ```
-### /api/demo/{dos | brute-force}:
-DoS saldırısı ve Brute Force saldırılarını manuel olarak simüle etmeyi sağlar.
 
 ## Kurulum & Çalıştırma
 SentinelWatch Lite sistemi, backend ve frontend olmak üzere iki ayrı sunucudan oluşmaktadır. Backend API sunucusu FastAPI (Python), frontend sunucusu ise React (Vite) ile geliştirilmiştir. Öncelikle gerekli kütüphane ve framework'ler yüklenir ve sonrasında iki sunucu ayrı ayrı çalıştırılır.
