@@ -340,7 +340,9 @@ async def api_alerts():
 
 @app.get("/api/rules")
 async def api_rules():
-    return "returns all rules"
+    query = "SELECT * FROM rules;"    
+    return await database.fetch_all(query=query)
+    
 
 @app.post("/api/rules")
 async def api_rules():
