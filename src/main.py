@@ -337,33 +337,6 @@ async def check_high_cpu():
 @app.get("/api/alerts")
 async def api_alerts():
     return await check_alerts_by_rules()
-    
-
-
-    results = []    
-    
-    for attack in await check_brute_force():
-        results.append(attack)
-        
-    event_count = await check_traffic_spike()
-    if event_count != 0:
-        results.append({
-            "type": "TRAFFIC_SPIKE",
-            "severity": "MEDIUM",
-            "event_count": event_count,
-            "description": f"Son 1 dakika icerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
-        })
-        
-    event_count = await check_high_cpu()
-    if event_count != 0:
-        results.append({
-            "type": "HIGH_CPU",
-            "severity": "LOW",
-            "event_count": event_count,
-            "description": f"Son 2 dakika icerisinde {event_count} adet yuksek CPU kullanimi olayi olustu"
-        })    
-    
-    return results
 
 @app.get("/api/rules")
 async def api_rules():
