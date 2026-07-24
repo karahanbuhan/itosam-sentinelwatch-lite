@@ -245,7 +245,7 @@ async def check_alerts_by_rules():
                 
                 if rule["time_window_seconds"] < dtime.seconds:
                     continue
-                
+
                 events_by_types[rule["event_type"].lower()].append(event)
                 
                 if rule["name"] not in rule_hit_counter:
@@ -274,25 +274,45 @@ async def check_alerts_by_rules():
                 for ip in ip_events_dict:
                     if len(ip_events_dict[ip]) >= rule["threshold_count"]:
                         alerts.append({
-                            "ruleName": rule["name"],
+                            "rule_id": rule["id"],
+                            "rule_name": rule["name"],
                             "timestamp": timestamp.isoformat(),
-                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
+                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet {rule["name"]} kuralı tetiklendi",
                             "event_count": len(ip_events_dict[ip]),
+                            "event_type": rule["event_type"].upper(),
                             "source_ip": ip,
+                            "username": event["username"],
                             "severity": rule["severity"],
-                            "isResolved": False
+                            "is_resolved": False
                         })
             else:
                 alerts.append({
-                    "ruleName": rule["name"],
+                    "rule_id": rule["id"],
+                    "rule_name": rule["name"],
                     "timestamp": timestamp.isoformat(),
-                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet {rule["name"]} kuralı tetiklendi",
                     "event_count": rule_hit_counter[rule["name"]],
+                    "event_type": rule["event_type"].upper(),
+                    "username": event["username"],
                     "severity": rule["severity"],
-                    "isResolved": False
-                })
-            # TODO: Veritabanına uyarıları yerleştir
+                    "is_resolved": False
+                })                        
+        
+    for alert in alerts:
+        if "source_ip" in alert:
+            source_ip = alert["source_ip"]
+        else:
+            source_ip = None
             
+        query = "INSERT INTO alerts (rule_id, timestamp, source_ip, description, is_resolved) VALUES(:rule_id, :timestamp, :source_ip, :description, 0);"
+        values = [{
+                "rule_id": alert["rule_id"],
+                "timestamp": timestamp.isoformat(),
+                "source_ip": source_ip,
+                "description": alert["description"]
+            }]
+        print(query, values)
+        await database.execute_many(query=query, values=values)            
     
     return alerts
 
@@ -317,37 +337,12 @@ async def check_high_cpu():
 @app.get("/api/alerts")
 async def api_alerts():
     return await check_alerts_by_rules()
-    
-
-
-    results = []    
-    
-    for attack in await check_brute_force():
-        results.append(attack)
-        
-    event_count = await check_traffic_spike()
-    if event_count != 0:
-        results.append({
-            "type": "TRAFFIC_SPIKE",
-            "severity": "MEDIUM",
-            "event_count": event_count,
-            "description": f"Son 1 dakika icerisinde {event_count} adet olay oldu, trafik limiti 100 asildi"
-        })
-        
-    event_count = await check_high_cpu()
-    if event_count != 0:
-        results.append({
-            "type": "HIGH_CPU",
-            "severity": "LOW",
-            "event_count": event_count,
-            "description": f"Son 2 dakika icerisinde {event_count} adet yuksek CPU kullanimi olayi olustu"
-        })    
-    
-    return results
 
 @app.get("/api/rules")
 async def api_rules():
-    return "returns all rules"
+    query = "SELECT * FROM rules;"    
+    return await database.fetch_all(query=query)
+    
 
 @app.post("/api/rules")
 async def api_rules():
@@ -357,9 +352,10 @@ async def api_rules():
 async def api_rules(id: str):
     return "enables disables the rule"
 
-@app.get("api/alerts/history")
+@app.get("/api/alerts/history")
 async def api_alerts_history():
-    return "Filters and lists the alerts"
+    query = "SELECT * FROM alerts;"    
+    return await database.fetch_all(query=query)
 
 @app.patch("api/alerts/{id}/resolve")
 async def api_alerts_resolve():
