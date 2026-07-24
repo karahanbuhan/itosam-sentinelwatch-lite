@@ -25,7 +25,7 @@ def upgrade() -> None:
         sa.Column("id", sa.INTEGER, primary_key=True),
         sa.Column("rule_id", sa.INTEGER, nullable=False),
         sa.Column("timestamp", sa.String, nullable=False),
-        sa.Column("source_ip", sa.String, nullable= False),
+        sa.Column("source_ip", sa.String, nullable= True),
         sa.Column("description", sa.String, nullable=False),
         sa.Column("is_resolved", sa.INTEGER, nullable=False)
     )

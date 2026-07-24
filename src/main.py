@@ -245,7 +245,7 @@ async def check_alerts_by_rules():
                 
                 if rule["time_window_seconds"] < dtime.seconds:
                     continue
-                
+
                 events_by_types[rule["event_type"].lower()].append(event)
                 
                 if rule["name"] not in rule_hit_counter:
@@ -274,25 +274,43 @@ async def check_alerts_by_rules():
                 for ip in ip_events_dict:
                     if len(ip_events_dict[ip]) >= rule["threshold_count"]:
                         alerts.append({
-                            "ruleName": rule["name"],
+                            "rule_name": rule["name"],
                             "timestamp": timestamp.isoformat(),
                             "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
                             "event_count": len(ip_events_dict[ip]),
+                            "event_type": rule["event_type"].upper(),
                             "source_ip": ip,
+                            "username": event["username"],
                             "severity": rule["severity"],
-                            "isResolved": False
+                            "is_resolved": False
                         })
             else:
                 alerts.append({
-                    "ruleName": rule["name"],
+                    "rule_name": rule["name"],
                     "timestamp": timestamp.isoformat(),
                     "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
                     "event_count": rule_hit_counter[rule["name"]],
+                    "event_type": rule["event_type"].upper(),
+                    "username": event["username"],
                     "severity": rule["severity"],
-                    "isResolved": False
-                })
-            # TODO: Veritabanına uyarıları yerleştir
+                    "is_resolved": False
+                })                        
+        
+    for alert in alerts:
+        if "source_ip" in alert:
+            source_ip = alert["source_ip"]
+        else:
+            source_ip = None
             
+        query = "INSERT INTO alerts (rule_id, timestamp, source_ip, description, is_resolved) VALUES(:rule_id, :timestamp, :source_ip, :description, 0);"
+        values = [{
+                "rule_id": alert["rule_name"],
+                "timestamp": timestamp.isoformat(),
+                "source_ip": source_ip,
+                "description": alert["description"]
+            }]
+        print(query)
+        await database.execute_many(query=query, values=values)            
     
     return alerts
 
