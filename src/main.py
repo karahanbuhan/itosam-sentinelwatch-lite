@@ -274,9 +274,10 @@ async def check_alerts_by_rules():
                 for ip in ip_events_dict:
                     if len(ip_events_dict[ip]) >= rule["threshold_count"]:
                         alerts.append({
+                            "rule_id": rule["id"],
                             "rule_name": rule["name"],
                             "timestamp": timestamp.isoformat(),
-                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet olay oldu",
+                            "description": f"Son {rule["time_window_seconds"]} saniyede {len(ip_events_dict[ip])} adet {rule["name"]} kuralı tetiklendi",
                             "event_count": len(ip_events_dict[ip]),
                             "event_type": rule["event_type"].upper(),
                             "source_ip": ip,
@@ -286,9 +287,10 @@ async def check_alerts_by_rules():
                         })
             else:
                 alerts.append({
+                    "rule_id": rule["id"],
                     "rule_name": rule["name"],
                     "timestamp": timestamp.isoformat(),
-                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet olay oldu",
+                    "description": f"Son {rule["time_window_seconds"]} saniyede {rule_hit_counter[rule["name"]]} adet {rule["name"]} kuralı tetiklendi",
                     "event_count": rule_hit_counter[rule["name"]],
                     "event_type": rule["event_type"].upper(),
                     "username": event["username"],
@@ -304,12 +306,12 @@ async def check_alerts_by_rules():
             
         query = "INSERT INTO alerts (rule_id, timestamp, source_ip, description, is_resolved) VALUES(:rule_id, :timestamp, :source_ip, :description, 0);"
         values = [{
-                "rule_id": alert["rule_name"],
+                "rule_id": alert["rule_id"],
                 "timestamp": timestamp.isoformat(),
                 "source_ip": source_ip,
                 "description": alert["description"]
             }]
-        print(query)
+        print(query, values)
         await database.execute_many(query=query, values=values)            
     
     return alerts
