@@ -20,7 +20,7 @@
 
 /* Modern Açık Tema Dropdown */
 .filter-select {
-  @apply bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm;
+  @apply bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg px-3 py-2 outline-none cursor-pointer hover:border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm inline-flex items-center justify-center align-middle h-auto leading-none;
 }
 .dark .filter-select {
   @apply bg-slate-800 border-slate-700 text-slate-200 focus:border-blue-500 focus:ring-0;
@@ -51,6 +51,29 @@
 
 .alarm-badge {
   @apply text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border;
+}
+
+/* Mini İstatistik Kartı */
+.stats-mini-card {
+  @apply bg-white border border-slate-200/70 rounded-xl p-4 shadow-sm;
+}
+.dark .stats-mini-card {
+  @apply bg-slate-900 border-slate-800;
+}
+
+.stats-mini-item {
+  @apply flex flex-col bg-slate-50 rounded-lg px-3 py-2;
+}
+.dark .stats-mini-item {
+  @apply bg-slate-800/60;
+}
+
+.stats-mini-value {
+  @apply text-lg font-bold leading-tight;
+}
+
+.stats-mini-label {
+  @apply text-[9px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5;
 }
 
 /* Sade ve Premium Kart Yapısı */
