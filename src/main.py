@@ -352,9 +352,10 @@ async def api_rules():
 async def api_rules(id: str):
     return "enables disables the rule"
 
-@app.get("api/alerts/history")
+@app.get("/api/alerts/history")
 async def api_alerts_history():
-    return "Filters and lists the alerts"
+    query = "SELECT * FROM alerts;"    
+    return await database.fetch_all(query=query)
 
 @app.patch("api/alerts/{id}/resolve")
 async def api_alerts_resolve():
